@@ -32,8 +32,8 @@ Message * fetch_msg()
     Message * m = new Message;
 
     do {
-        recv(sockfd, &m, sizeof(Message), 0);
-    } while (m->mark != MARKER);
+        recv(sockfd, m, sizeof(Message), 0);
+    } while (m->mark != MARKER || !m);
 
     return m;
 }
