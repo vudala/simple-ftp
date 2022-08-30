@@ -1,18 +1,17 @@
 
-#include "socket.h"
+#include "api.h"
+#include "message.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <stdio.h>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 int main() {
-    int sockfd = ConexaoRawSocket((char *) "lo");
+    init_con();
 
-    char buffer[1024];
+    string a = "teste123";
 
-    recv(sockfd, buffer, 30, MSG_WAITALL);
-
-    buffer[29] = '\0';
-
-    printf(buffer);   
+    send_msg();
 }
