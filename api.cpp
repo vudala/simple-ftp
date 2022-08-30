@@ -22,8 +22,10 @@ void init_con()
     sockfd = ConexaoRawSocket((char *) "lo");
 
     memset(&Target, 0, sizeof(struct sockaddr_in));
-    Target.sin_family = AF_INET; // IPv4 
-    inet_aton(Target_Addr, &Target.sin_addr);
+
+    Target.sin_family = AF_INET;
+    Target.sin_port = htons(64000);
+    Target.sin_addr.s_addr = inet_addr (Target_Addr);
 }
 
 
