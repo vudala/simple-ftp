@@ -8,10 +8,16 @@
 
 using namespace std;
 
-int main() {
+char * Target_Addr;
+
+int main(int argc, char * argv[]) {
+    Target_Addr = argv[1];
+
     init_con();
 
     string a = "teste123";
 
-    send_msg();
+    Message * m = new_msg(a.length(), 0, 0, &a[0]);
+    
+    send_msg(m);
 }

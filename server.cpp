@@ -5,7 +5,11 @@
 
 using namespace std;
 
-int main(){
+char * Target_Addr;
+
+int main(int argc, char * argv[]) {
+    Target_Addr = argv[1];
+
     init_con();
 
     Message * m = fetch_msg();
