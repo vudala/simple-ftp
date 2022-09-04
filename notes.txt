@@ -1,2 +1,2 @@
-desktop 192.168.15.4
-notebook 192.168.15.23
+sudo ./client wlp2s0
+sudo ./server enp7s0

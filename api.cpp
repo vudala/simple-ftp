@@ -8,24 +8,19 @@
 #include <sys/socket.h>
 #include <arpa/inet.h> 
 #include <netinet/in.h>
+#include <linux/if_packet.h>
+#include <net/ethernet.h>
 #include <bits/stdc++.h>
 
 using namespace std;
 
-extern char * Target_Addr;
-struct sockaddr_in Target;
+extern char * Interface;
 
 int sockfd;
 
 void init_con()
 {
-    sockfd = ConexaoRawSocket((char *) "lo");
-
-    memset(&Target, 0, sizeof(struct sockaddr_in));
-
-    Target.sin_family = AF_INET;
-    Target.sin_port = htons(64000);
-    Target.sin_addr.s_addr = inet_addr (Target_Addr);
+    sockfd = ConexaoRawSocket((char *) Interface);
 }
 
 
@@ -59,12 +54,12 @@ void send_nack(unsigned seq)
 
 void send_msg(Message * msg)
 {
-    sendto(
+    if (send(
         sockfd,
         (const char *) msg,
         sizeof(Message),  
-        MSG_CONFIRM,
-        (const struct sockaddr *) &Target, 
-        sizeof(Target)
-    );
+        0
+    ) == -1) {
+        perror("sendto: ");
+    };
 }

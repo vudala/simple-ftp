@@ -8,10 +8,10 @@
 
 using namespace std;
 
-char * Target_Addr;
+char * Interface;
 
 int main(int argc, char * argv[]) {
-    Target_Addr = argv[1];
+    Interface = argv[1];
 
     init_con();
 
