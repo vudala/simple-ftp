@@ -11,6 +11,8 @@
 #include <linux/if_packet.h>
 #include <net/ethernet.h>
 #include <bits/stdc++.h>
+#include <errno.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -18,7 +20,7 @@ extern char * Interface;
 
 int sockfd;
 
-void sighandler(int sign)
+void inthandler(int sig)
 {
     int t = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &t, sizeof(int));
@@ -26,20 +28,35 @@ void sighandler(int sign)
     exit(0);
 }
 
-void init_con()
+
+void alrmhandler(int sig)
 {
-    sockfd = ConexaoRawSocket((char *) Interface);
-    signal(SIGINT, sighandler);
+    errno = TIMED_OUT;
 }
 
 
-Message * fetch_msg()
+void init_con()
 {
-    Message * m = new Message;
+    sockfd = ConexaoRawSocket((char *) Interface);
+    signal(SIGINT, inthandler);
+    signal(SIGALRM, alrmhandler);
+}
 
+
+Message * fetch_msg(bool tout)
+{
+    Message * m = new Message();
+
+    if (tout) {
+        errno = 0;
+        alarm(TIMEOUT_SECONDS);
+    }
     do {
         recv(sockfd, m, sizeof(Message), 0);
-    } while (m->mark != MARKER || !m);
+        if (errno == TIMED_OUT)
+            return NULL;
+    } while (m->mark != MARKER);
+    alarm(0);
 
     return m;
 }
@@ -63,12 +80,8 @@ void send_nack(unsigned seq)
 
 void send_msg(Message * msg)
 {
-    if (send(
-        sockfd,
-        (const char *) msg,
-        sizeof(Message),  
-        0
-    ) == -1) {
-        perror("sendto: ");
+    if (send(sockfd, (const char *) msg, sizeof(Message), 0) == -1) {
+        perror("send_msg: ");
+        exit(-1);
     };
 }

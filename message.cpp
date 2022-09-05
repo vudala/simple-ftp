@@ -4,29 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-int crc(Message * m)
+int _crc(Message * m)
 {
     return 1;
 }
 
-Message * new_msg(unsigned size, unsigned seq, unsigned type, char * data)
+Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 {
-    if (size > 64) return NULL;
-
-    Message * m = new Message;
-
-    m->mark = MARKER;
-    m->size = size;
-    m->seq = seq;
-    m->type = type;
+    this->mark = MARKER;
+    this->size = size;
+    this->seq = seq;
+    this->type = type;
     if (data)
-        memcpy(&m->data, data, size);
-    m->crc = crc(m);
-
-    return m;
+        memcpy(&this->data, data, size);
+    this->crc = _crc(this);
 }
 
 bool valid_msg(Message * m)
 {
-    return crc(m) == m->crc;
+    if (!m) return false;
+    return _crc(m) == m->crc;
 }

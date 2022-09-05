@@ -16,12 +16,25 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
-    string a = "1987654321";
+    string data = "1987654321";
 
-    Message * m = new_msg(a.length(), 0, 0, &a[0]);
+    // manda a mensagem e fica esperando uma resposta
+    Message * msg = new Message(data.length(), 0, 0, &data[0]);
+    Message * answer = NULL;
+    do {
+        send_msg(msg);
+        answer = fetch_msg(true);
+    } while(!answer);
+
+    // resposta chega
+    if (valid_msg(answer)) {
+        // se recebeu um nack, envia a mensagem até ser aceita
+        while(answer->type == NACK) {
+            do {
+                send_msg(msg);
+                answer = fetch_msg(true);
+            } while(!answer);
+        }
+    }
     
-    while(1) {
-        send_msg(m);
-        usleep(500);
-    }       
 }

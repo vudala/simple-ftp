@@ -27,16 +27,16 @@ enum Control {
 };
 
 
-
-typedef struct __attribute__ ((__packed__)) message_t {
+typedef struct __attribute__ ((__packed__)) Message {
     unsigned    mark:8;        // marcador de inicio
     unsigned    size:6;        // tamanho: 6 bits
     unsigned    seq:4;         // sequencia: 4 bits
     unsigned    type:6;        // tipo: 6 bits
-    byte        data[2 << 5];  // dados: size bytes
+    byte        data[64];      // dados: size bytes
     unsigned    crc:8;         // crc: 8 bits
+    Message();
+    Message(unsigned size, unsigned seq, unsigned type, char * data);
 } Message;
-
 
 Message * new_msg(unsigned size, unsigned seq, unsigned type, char * data);
 

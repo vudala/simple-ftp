@@ -12,12 +12,13 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
-    while (1) {
-        Message * m = fetch_msg();
-        while (!valid_msg(m)) {
-            send_nack(m->seq);
-            m = fetch_msg();
-        }
-        cout << m->data << '\n';
+    // recebe uma mensagem
+    Message * m = fetch_msg(false);
+
+    while(!valid_msg(m)) {
+        free(m);
+        send_nack(0);
+        m = fetch_msg(false);
     }
+    send_ack(0);
 }
