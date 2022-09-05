@@ -5,7 +5,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <bits/stdc++.h>
-
+#include <stdlib.h>
+#include <unistd.h>
 using namespace std;
 
 char * Interface;
@@ -15,9 +16,12 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
-    string a = "teste123";
+    string a = "1987654321";
 
     Message * m = new_msg(a.length(), 0, 0, &a[0]);
     
-    send_msg(m);
+    while(1) {
+        send_msg(m);
+        usleep(500);
+    }       
 }

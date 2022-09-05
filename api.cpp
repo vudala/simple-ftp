@@ -18,9 +18,18 @@ extern char * Interface;
 
 int sockfd;
 
+void sighandler(int sign)
+{
+    int t = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &t, sizeof(int));
+    cout << "interrupted\n";
+    exit(0);
+}
+
 void init_con()
 {
     sockfd = ConexaoRawSocket((char *) Interface);
+    signal(SIGINT, sighandler);
 }
 
 

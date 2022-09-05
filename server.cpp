@@ -5,18 +5,19 @@
 
 using namespace std;
 
-char * Target_Addr;
+char * Interface;
 
 int main(int argc, char * argv[]) {
-    Target_Addr = argv[1];
+    Interface = argv[1];
 
     init_con();
 
-    Message * m = fetch_msg();
-    while (!valid_msg(m)) {
-        send_nack(m->seq);
-        m = fetch_msg();
+    while (1) {
+        Message * m = fetch_msg();
+        while (!valid_msg(m)) {
+            send_nack(m->seq);
+            m = fetch_msg();
+        }
+        cout << m->data << '\n';
     }
-    
-    cout << m->data << '\n';
 }
