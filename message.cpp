@@ -24,6 +24,5 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 
 bool valid_msg(Message * m)
 {
-    if (!m) return false;
     return _crc(m) == m->crc;
 }

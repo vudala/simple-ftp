@@ -1,7 +1,9 @@
 
 #include "api.h"
+#include "commands.h"
 
 #include <bits/stdc++.h>
+
 
 using namespace std;
 
@@ -26,6 +28,7 @@ int main(int argc, char * argv[]) {
     {
     case LS:
         /* code */
+        execute_ls();
         break;
     case CD:
         /* code */
