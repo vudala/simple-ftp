@@ -52,13 +52,5 @@ int ConexaoRawSocket(char *device)
       exit(-1);
     }
 
-    // struct timeval tv;
-    // tv.tv_sec = 10;
-    // tv.tv_usec = 0;
-    // if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) == -1) {
-    //     perror("Erro setar timeout: ");
-    //     exit(-1);
-    // }
-
     return sockfd;
 }

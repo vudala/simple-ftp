@@ -9,6 +9,8 @@ int _crc(Message * m)
     return 1;
 }
 
+Message::Message() {}
+
 Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 {
     this->mark = MARKER;

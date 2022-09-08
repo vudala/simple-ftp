@@ -52,7 +52,10 @@ Message * fetch_msg(bool tout)
         alarm(TIMEOUT_SECONDS);
     }
     do {
-        recv(sockfd, m, sizeof(Message), 0);
+        if (recv(sockfd, m, sizeof(Message), 0) == -1) {
+            perror("recv: ");
+            exit(-1);
+        };
         if (errno == TIMED_OUT)
             return NULL;
     } while (m->mark != MARKER);
@@ -64,7 +67,7 @@ Message * fetch_msg(bool tout)
 
 void send_ack(unsigned seq)
 {
-    Message * m = new_msg(0, seq, ACK, NULL);
+    Message * m = new Message(0, seq, ACK, NULL);
     send_msg(m);
     free(m);
 }
@@ -72,7 +75,15 @@ void send_ack(unsigned seq)
 
 void send_nack(unsigned seq)
 {
-    Message * m = new_msg(0, seq, NACK, NULL);
+    Message * m = new Message(0, seq, NACK, NULL);
+    send_msg(m);
+    free(m);
+}
+
+
+void send_ok()
+{
+    Message * m = new Message(0, 0, OK, NULL);
     send_msg(m);
     free(m);
 }
@@ -84,4 +95,28 @@ void send_msg(Message * msg)
         perror("send_msg: ");
         exit(-1);
     };
+}
+
+
+void assert_send(Message * msg)
+{
+    Message * answer = NULL;
+    do {
+        send_msg(msg);
+        answer = fetch_msg(true);
+    } while(!answer || !valid_msg(answer) || msg->type != ACK || answer->seq != msg->seq);
+}
+
+
+Message * assert_recv(unsigned int seq)
+{
+    Message * msg = fetch_msg(false);
+    while(!valid_msg(msg) || msg->seq != seq) {
+        free(msg);
+        send_nack(seq);
+        msg = fetch_msg(false);
+    }
+    send_ack(seq);
+
+    return msg;
 }

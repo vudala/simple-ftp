@@ -11,6 +11,7 @@ using namespace std;
 
 char * Interface;
 
+
 int main(int argc, char * argv[]) {
     Interface = argv[1];
 
@@ -24,17 +25,5 @@ int main(int argc, char * argv[]) {
     do {
         send_msg(msg);
         answer = fetch_msg(true);
-    } while(!answer);
-
-    // resposta chega
-    if (valid_msg(answer)) {
-        // se recebeu um nack, envia a mensagem até ser aceita
-        while(answer->type == NACK) {
-            do {
-                send_msg(msg);
-                answer = fetch_msg(true);
-            } while(!answer);
-        }
-    }
-    
+    } while(!answer || !valid_msg(answer) || msg->type != OK);
 }
