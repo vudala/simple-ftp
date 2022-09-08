@@ -17,13 +17,15 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
-    string data = "1987654321";
-
     // manda a mensagem e fica esperando uma resposta
-    Message * msg = new Message(data.length(), 0, 0, &data[0]);
+    Message * msg = new Message(0, 0, LS, NULL);
     Message * answer = NULL;
     do {
         send_msg(msg);
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || msg->type != OK);
+    } while(!answer || !valid_msg(answer) || msg->type == NACK);
+
+    string * str = recv_stream();
+
+    cout << *str;
 }

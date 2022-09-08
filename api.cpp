@@ -186,7 +186,6 @@ string * recv_stream()
             send_ack(seq);
 
             (*result).append(string((char*) msg->data));
-            free(msg);
 
             last_seq = seq;
             seq = (seq + 1) % 16;
