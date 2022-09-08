@@ -128,3 +128,42 @@ Message * assert_recv(unsigned int seq)
 
     return msg;
 }
+
+
+void send_stream(FILE * stream)
+{
+    char buffer[64];
+    Message * msg = NULL;
+    unsigned seq = 0;
+    int type = DADOS;
+    int bytes_read = fread(buffer, sizeof(char), 64, stream);
+    do {
+        if (feof(stream))
+            type = FIM;
+
+        msg = new Message(bytes_read, seq, type, buffer);
+        assert_send(msg);
+        free(msg);
+        
+        bytes_read = fread(buffer, sizeof(char), 64, stream);
+        seq = (seq + 1) % 16;
+    } while(bytes_read > 0);
+}
+
+
+string * recv_stream()
+{
+    Message * msg = NULL;
+    unsigned seq = 0;
+    int type = DADOS;
+
+    string * result = new string;
+    do {
+        msg = assert_recv(seq);
+        (*result).append((char*) &(msg->data[0]));
+        free(msg);
+        seq = (seq + 1) % 16;
+    } while(msg->type != FIM);
+
+    return result;
+}

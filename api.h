@@ -3,6 +3,8 @@
 
 #include "message.h"
 
+#include <bits/stdc++.h>
+
 #define TIMEOUT_SECONDS 1
 
 // inicializa estruturas
@@ -28,5 +30,11 @@ void assert_send(Message * msg);
 
 // assegura o recebimento de uma mensagem
 Message * assert_recv(unsigned seq);
+
+// recebe uma sequencia de conteudos de uma interface
+std::string * recv_stream();
+
+// envia o conteudo de stream para a interface
+void send_stream(FILE * stream);
 
 #endif

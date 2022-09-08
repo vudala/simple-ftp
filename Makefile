@@ -1,12 +1,34 @@
+#!/bin/bash
 
+CC=g++
+FLAGS=-Wall -g
+LIBS=
+SRC=$(wildcard *.cpp)
 
-server:
-	g++ -g server.cpp message.cpp utils.cpp socket.cpp api.cpp -o server
+# todos os objetos a serem compilados
+OBJS=$(subst .cpp,.o,$(SRC))
 
-client:
-	g++ -g client.cpp message.cpp utils.cpp socket.cpp api.cpp -o client
+# apenas os objetos com a main
+MAIN_OBJS=server.o client.o
 
+# apenas os commmons objects
+COMMON_OBJS=$(filter-out $(MAIN_OBJS),$(OBJS))
+RM=rm -f
+
+all: client server
+
+client: $(COMMON_OBJS) client.o
+	$(CC) $(FLAGS) $(COMMON_OBJS) $@.o -o client $(LIBS)
+
+server: $(COMMON_OBJS) server.o
+	$(CC) $(FLAGS) $(COMMON_OBJS) $@.o -o server $(LIBS)
+
+%.o: %.cpp
+	$(CC) $(FLAGS) -c $<
 
 clean:
-	rm server
-	rm client
+	$(RM) $(OBJS)
+
+purge: clean
+	$(RM) client
+	$(RM) server
