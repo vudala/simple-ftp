@@ -142,15 +142,29 @@ void send_stream(FILE * stream)
     unsigned seq = 0;
     int type = DADOS;
 
-    while(!feof(stream)) {
-        char * read_data = fgets(buffer, 64, stream);
+    char c;
+    int bytes_read;
+    string str;
+    while(type != FIM) {
+        // le os bytes da stream
+        bytes_read = 0;
+        c = fgetc(stream);
+        while(c != EOF && bytes_read < 64) {
+            buffer[bytes_read] = c;
+            bytes_read++;
+
+            if (bytes_read < 64)
+                c = fgetc(stream);
+        }
         
+        // se leu tudo, marca como fim
         if (feof(stream))
             type = FIM;
 
-        msg = new Message(strlen(read_data), seq, type, buffer);
-
+        // envia os dados
+        msg = new Message(bytes_read, seq, type, buffer);
         assert_send(msg);
+        free(msg);
 
         seq = (seq + 1) % 16;
     }
@@ -171,7 +185,7 @@ string * recv_stream()
         if (msg->seq == seq) {
             send_ack(seq);
 
-            (*result).append((char*) &(msg->data[0]));
+            (*result).append(string((char*) msg->data));
             free(msg);
 
             last_seq = seq;
