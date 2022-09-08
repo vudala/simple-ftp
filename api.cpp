@@ -136,18 +136,19 @@ void send_stream(FILE * stream)
     Message * msg = NULL;
     unsigned seq = 0;
     int type = DADOS;
-    int bytes_read = fread(buffer, sizeof(char), 64, stream);
-    do {
+
+    while(!feof(stream)) {
+        char * read_data = fgets(buffer, 64, stream);
+        
         if (feof(stream))
             type = FIM;
 
-        msg = new Message(bytes_read, seq, type, buffer);
+        msg = new Message(strlen(read_data), seq, type, buffer);
+
         assert_send(msg);
-        free(msg);
-        
-        bytes_read = fread(buffer, sizeof(char), 64, stream);
+
         seq = (seq + 1) % 16;
-    } while(bytes_read > 0);
+    }
 }
 
 
