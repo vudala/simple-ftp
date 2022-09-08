@@ -20,6 +20,8 @@ extern char * Interface;
 
 int sockfd;
 
+bool Interrupted = false;
+
 void inthandler(int sig)
 {
     int t = 1;
@@ -31,15 +33,19 @@ void inthandler(int sig)
 
 void alrmhandler(int sig)
 {
-    errno = TIMED_OUT;
+    Interrupted = true;
 }
 
 
 void init_con()
 {
     sockfd = ConexaoRawSocket((char *) Interface);
-    signal(SIGINT, inthandler);
-    signal(SIGALRM, alrmhandler);
+
+    struct sigaction action;
+    action.sa_handler = alrmhandler;
+    sigemptyset (&action.sa_mask) ;
+    action.sa_flags = 0 ;
+    sigaction (SIGALRM, &action, 0);
 }
 
 
@@ -47,17 +53,19 @@ Message * fetch_msg(bool tout)
 {
     Message * m = new Message();
 
+    Interrupted = false;
     if (tout) {
         errno = 0;
         alarm(TIMEOUT_SECONDS);
     }
     do {
         if (recv(sockfd, m, sizeof(Message), 0) == -1) {
+            if (Interrupted)
+                return NULL;
             perror("recv: ");
             exit(-1);
         };
-        if (errno == TIMED_OUT)
-            return NULL;
+            
     } while (m->mark != MARKER);
     alarm(0);
 

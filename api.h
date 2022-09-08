@@ -3,8 +3,7 @@
 
 #include "message.h"
 
-#define TIMED_OUT 99
-#define TIMEOUT_SECONDS 5
+#define TIMEOUT_SECONDS 1
 
 // inicializa estruturas
 void init_con();

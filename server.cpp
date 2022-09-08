@@ -12,6 +12,9 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
+    if (fetch_msg(true)) cout << "success\n";
+    else cout << "timeout\n";
+
     // recebe uma mensagem
     Message * m = fetch_msg(false);
     while(!valid_msg(m)) {
