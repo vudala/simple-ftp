@@ -46,6 +46,11 @@ void init_con()
     sigemptyset (&action.sa_mask) ;
     action.sa_flags = 0 ;
     sigaction (SIGALRM, &action, 0);
+
+    action.sa_handler = inthandler;
+    sigemptyset (&action.sa_mask) ;
+    action.sa_flags = 0 ;
+    sigaction (SIGINT, &action, 0);
 }
 
 
@@ -54,10 +59,10 @@ Message * fetch_msg(bool tout)
     Message * m = new Message();
 
     Interrupted = false;
-    if (tout) {
-        errno = 0;
+
+    if (tout)
         alarm(TIMEOUT_SECONDS);
-    }
+    
     do {
         if (recv(sockfd, m, sizeof(Message), 0) == -1) {
             if (Interrupted)
@@ -67,6 +72,7 @@ Message * fetch_msg(bool tout)
         };
             
     } while (m->mark != MARKER);
+
     alarm(0);
 
     return m;
