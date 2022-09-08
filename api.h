@@ -20,7 +20,7 @@ void send_ack(unsigned seq);
 void send_nack(unsigned seq);
 
 // envia um ok para a interface
-void send_ok();
+void send_ok(unsigned seq);
 
 // envia um mensagem para a interface
 void send_msg(Message * msg);

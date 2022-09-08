@@ -95,9 +95,9 @@ void send_nack(unsigned seq)
 }
 
 
-void send_ok()
+void send_ok(unsigned seq)
 {
-    Message * m = new Message(0, 0, OK, NULL);
+    Message * m = new Message(0, seq, OK, NULL);
     send_msg(m);
     free(m);
 }
@@ -118,19 +118,18 @@ void assert_send(Message * msg)
     do {
         send_msg(msg);
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || msg->type != ACK || answer->seq != msg->seq);
+    } while(!answer || !valid_msg(answer) || msg->type == NACK || answer->seq != msg->seq);
 }
 
 
-Message * assert_recv(unsigned int seq)
+Message * assert_recv(unsigned seq)
 {
     Message * msg = fetch_msg(false);
-    while(!valid_msg(msg) || msg->seq != seq) {
+    while(!valid_msg(msg)) {
         free(msg);
         send_nack(seq);
         msg = fetch_msg(false);
     }
-    send_ack(seq);
 
     return msg;
 }
@@ -161,15 +160,26 @@ void send_stream(FILE * stream)
 string * recv_stream()
 {
     Message * msg = NULL;
+    unsigned last_seq = 1987654321;
     unsigned seq = 0;
     int type = DADOS;
 
     string * result = new string;
     do {
         msg = assert_recv(seq);
-        (*result).append((char*) &(msg->data[0]));
-        free(msg);
-        seq = (seq + 1) % 16;
+
+        if (msg->seq == seq) {
+            send_ack(seq);
+
+            (*result).append((char*) &(msg->data[0]));
+            free(msg);
+
+            last_seq = seq;
+            seq = (seq + 1) % 16;
+        }
+        else if (msg->seq == last_seq)
+            send_ack(last_seq);
+        
     } while(msg->type != FIM);
 
     return result;

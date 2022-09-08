@@ -21,7 +21,7 @@ int main(int argc, char * argv[]) {
         send_nack(m->seq);
         m = fetch_msg(false);
     }
-    send_ok();
+    send_ok(m->seq);
     
     // faz a operacao
     switch (m->type)
