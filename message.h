@@ -3,9 +3,6 @@
 
 #define MARKER 0b01111110
 
-#define byte unsigned char
-
-
 enum Commands {
     LS = 0b000111,
     ls_mostra_na_tela = 0b111111,
@@ -13,6 +10,7 @@ enum Commands {
     GET = 0b001001,
     PUT = 0b001010,
     MKDIR = 0b001000,
+    CLOSE = 0b100111
 };
 
 

@@ -32,7 +32,7 @@ void assert_send(Message * msg);
 Message * assert_recv(unsigned seq);
 
 // recebe uma sequencia de conteudos de uma interface
-std::string * recv_stream();
+void recv_stream(std::ofstream output, bool standard_out);
 
 // envia o conteudo de stream para a interface
 void send_stream(FILE * stream);

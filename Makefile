@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CC=g++
-FLAGS=-Wall -g
+FLAGS=-Wall -g -std=c++17
 LIBS=
 SRC=$(wildcard *.cpp)
 
@@ -18,13 +18,13 @@ RM=rm -f
 all: client server
 
 teste: $(COMMON_OBJS) teste.o
-	$(CC) $(FLAGS) $(COMMON_OBJS) $@.o -o teste $(LIBS)
+	$(CC) $(COMMON_OBJS) $@.o -o teste $(LIBS)
 
 client: $(COMMON_OBJS) client.o
-	$(CC) $(FLAGS) $(COMMON_OBJS) $@.o -o client $(LIBS)
+	$(CC) $(COMMON_OBJS) $@.o -o client $(LIBS)
 
 server: $(COMMON_OBJS) server.o
-	$(CC) $(FLAGS) $(COMMON_OBJS) $@.o -o server $(LIBS)
+	$(CC) $(COMMON_OBJS) $@.o -o server $(LIBS)
 
 %.o: %.cpp
 	$(CC) $(FLAGS) -c $<

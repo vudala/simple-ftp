@@ -130,7 +130,6 @@ Message * assert_recv(unsigned seq)
         send_nack(seq);
         msg = fetch_msg(false);
     }
-
     return msg;
 }
 
@@ -152,7 +151,6 @@ void send_stream(FILE * stream)
         while(c != EOF && bytes_read < 64) {
             buffer[bytes_read] = c;
             bytes_read++;
-
             if (bytes_read < 64)
                 c = fgetc(stream);
         }
@@ -171,29 +169,32 @@ void send_stream(FILE * stream)
 }
 
 
-string * recv_stream()
+void recv_stream(ofstream output, bool standard_out)
 {
     Message * msg = NULL;
     unsigned last_seq = 1987654321;
     unsigned seq = 0;
-    int type = DADOS;
+    int status = DADOS;
 
-    string * result = new string;
     do {
         msg = assert_recv(seq);
+        status = msg->type;
 
         if (msg->seq == seq) {
             send_ack(seq);
 
-            (*result).append(string((char*) msg->data));
+            if (standard_out)
+                cout << string(msg->data);
+            else 
+                output << string(msg->data);
 
             last_seq = seq;
             seq = (seq + 1) % 16;
         }
+        // se recebeu a anterior, significa que o ack nao chegou no destino
         else if (msg->seq == last_seq)
             send_ack(last_seq);
-        
-    } while(msg->type != FIM);
 
-    return result;
+        free(msg);
+    } while(status != FIM);
 }
