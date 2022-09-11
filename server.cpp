@@ -58,6 +58,11 @@ int main(int argc, char * argv[]) {
             if (result)
                 assert_send(result);
             break;
+        case PWD:
+            f = popen("echo -n $PWD" , "r");
+            send_stream(f);
+            fclose(f);
+            break;
         case CLOSE:
             exit(0);
             break;

@@ -1,2 +1,0 @@
-sudo ./client wlp2s0
-sudo ./server enp7s0

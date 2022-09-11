@@ -2,7 +2,6 @@
 
 #include "socket.h"
 #include "message.h"
-#include "utils.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -183,10 +182,12 @@ void recv_stream(ofstream output, bool standard_out)
         if (msg->seq == seq) {
             send_ack(seq);
 
-            if (standard_out)
-                cout << string(msg->data);
-            else 
-                output << string(msg->data);
+            for(int i = 0; i < msg->size; i++) {
+                if (standard_out)
+                    cout << msg->data[i];
+                else 
+                    output << msg->data[i];
+            }
 
             last_seq = seq;
             seq = (seq + 1) % 16;
@@ -208,7 +209,6 @@ void print_stream(FILE * stream)
         cout << c;
         c = fgetc(stream);
     }
-    cout << '\n';
 }
 
 
