@@ -204,8 +204,11 @@ void recv_stream(ofstream output, bool standard_out)
 void print_stream(FILE * stream)
 {
     char c = fgetc(stream);
-    while(c != EOF)
+    while(c != EOF) {
         cout << c;
+        c = fgetc(stream);
+    }
+    cout << '\n';
 }
 
 
