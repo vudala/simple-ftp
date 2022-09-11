@@ -28,6 +28,7 @@ int main(int argc, char * argv[]) {
         FILE * f;
         Message * result = NULL;
         string command;
+        msg->data[msg->size] = '\0';
         switch (msg->type)
         {
         case LS:

@@ -26,15 +26,15 @@ int main(int argc, char * argv[]) {
     init_con();
 
 
-    cout << "Bem vindo ao SimpleFTP do vudala\n";
-    cout << "Comando disponiveis:\n";
-    cout << "ls { ,-l,-a,-la}\n";
-    cout << "cd {path}\n";
-    cout << "get {filename}\n";
-    cout << "put {filename}\n";
-    cout << "mkdir {dirname}\n";
-    cout << "env    # troca de ambiente\n";
-    cout << "close  # encerra o cliente";
+    cout << "Bem vindo ao SimpleFTP do vudala\n\n";
+    cout << "Comando disponiveis:\n\n";
+    cout << "ls     { ,-l,-a,-la}\n\n";
+    cout << "cd     {path}\n\n";
+    cout << "get    {filename}\n\n";
+    cout << "put    {filename}\n\n";
+    cout << "mkdir  {dirname}\n\n";
+    cout << "env    # troca de ambiente\n\n";
+    cout << "close  # encerra o cliente\n";
 
     while(1) {
         if (Local) {
