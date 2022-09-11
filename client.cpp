@@ -1,6 +1,7 @@
 
 #include "api.h"
 #include "message.h"
+#include "commands.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -11,35 +12,7 @@ using namespace std;
 
 char * Interface;
 
-tuple<int, string> get_op()
-{
-    string str_op, param;
-    cin >> str_op;
-
-    if (str_op == "ls")
-        return {LS, NULL};
-    
-    if (str_op == "cd") {
-        cin >> param;
-        return {CD, param};
-    }
-    if (str_op == "get") {
-        cin >> param;
-        return {GET, param};
-    }
-    if (str_op == "put") {
-        cin >> param;
-        return {PUT, param};
-    }
-    if (str_op == "mkdir") {
-        cin >> param;
-        return {MKDIR, param};
-    }
-    if (str_op == "close")
-        return {CLOSE, NULL};
-
-    return {0, NULL};
-}
+bool Local = true;
 
 
 int main(int argc, char * argv[]) {
@@ -47,49 +20,56 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
-    while(1) {
-        auto [opt, param] = get_op();
-        if (opt == 0) continue;
+    cout << filesystem::current_path() << ": ";
 
-        // manda a mensagem e fica esperando uma resposta
-        Message * msg = new Message(param.length(), 0, opt, &param[0]);
-        Message * answer = NULL;
-        do {
-            send_msg(msg);
-            answer = fetch_msg(true);
-        } while(!answer || !valid_msg(answer) || msg->type == NACK);
-        free(msg);
+    cin.clear();
+    cin.ignore(INT_MAX);
 
-        FILE * f;
-        switch (opt)
-        {
-        case LS:
-            // lista os arquivos no server
-            recv_stream(ofstream(), true);
-            break;
-        case CD:
-            // muda de pasta no server, nao necesita acao no cliente
-            break;
-        case GET:
-            // recebe um arquivo
-            recv_stream(ofstream(param, ios_base::app), false);
-            break;
-        case PUT:
-            // envia um arquivo para server
-            f = fopen(&param[0], "r");
-            send_stream(f);
+    string str_op, param;
+    cin >> str_op >> param;
+
+    if (str_op == "ls") {
+        if (Local) {
+            string command = "ls ";
+            command.append(param);
+            FILE * f = popen(&command[0], "r");
+            print_stream(f);
             fclose(f);
-            break;
-        case MKDIR:
-            // cria uma pasta no servidor, nao necesita acao no cliente
-            break;
-        case CLOSE:
-            // encerra a conexao
-            exit(0);
-            break;
-        default:
-            // faz nada
-            break;
+        }
+        else {
+            send_command(LS, param);
+            recv_stream(ofstream(), true);
         }
     }
+    if (str_op == "cd") {
+        if (Local)
+            execute_cd(param);
+        else {
+            send_command(CD, param);
+        }
+    }
+    if (str_op == "get") {
+        send_command(GET, param);
+        recv_stream(ofstream(param, ios_base::app), false);
+    }
+    if (str_op == "put") {
+        send_command(PUT, param);
+        send_file(&param[0]);
+    }
+    if (str_op == "mkdir") {
+        if (Local) {
+            Message * m = execute_mkdir(&param[0]);
+            if (m)
+                cout << string(m->data);
+        }
+        else {
+            send_command(MKDIR, param);
+            // recvok
+        }
+    }
+    if (str_op == "env") {
+        Local = !Local;
+    }
+    if (str_op == "close")
+        exit(0);
 }

@@ -22,19 +22,25 @@ int main(int argc, char * argv[]) {
             send_nack(msg->seq);
             msg = fetch_msg(false);
         }
-        send_ok(msg->seq);
+        send_ack(msg->seq);
         
         // faz a operacao
         FILE * f;
         Message * result = NULL;
+        string command;
         switch (msg->type)
         {
         case LS:
             // lista os arquivos no server
-            execute_ls();
+            command = "ls ";
+            command.append(string(msg->data));
+            FILE * f = popen(&command[0], "r");
+            send_stream(f);
+            fclose(f);
             break;
         case CD:
             // muda de pasta no server
+            execute_cd(string(msg->data));
             break;
         case GET:
             // envia um arquivo para o client

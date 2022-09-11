@@ -198,3 +198,26 @@ void recv_stream(ofstream output, bool standard_out)
         free(msg);
     } while(status != FIM);
 }
+
+
+
+void print_stream(FILE * stream)
+{
+    char c = fgetc(stream);
+    while(c != EOF)
+        cout << c;
+}
+
+
+void send_command(int opt, string param)
+{
+    // manda a mensagem e fica esperando uma resposta
+    Message * msg = new Message(param.length(), 0, opt, &param[0]);
+    Message * answer = NULL;
+    do {
+        send_msg(msg);
+        answer = fetch_msg(true);
+    } while(!answer || !valid_msg(answer) || msg->type == NACK);
+    free(msg);
+    free(answer);
+}

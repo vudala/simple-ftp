@@ -37,4 +37,10 @@ void recv_stream(std::ofstream output, bool standard_out);
 // envia o conteudo de stream para a interface
 void send_stream(FILE * stream);
 
+// imprime o conteudo de um arquivo
+void print_stream(FILE * stream);
+
+// envia comando para o servidor
+void send_command(int opt, string param);
+
 #endif
