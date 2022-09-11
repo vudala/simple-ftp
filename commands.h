@@ -3,12 +3,14 @@
 
 #include "message.h"
 
-void execute_ls(bool local, string param);
+#include <bits/stdc++.h>
 
-Message * execute_mkdir(string name);
+void execute_ls(bool local, std::string param);
 
-Message * execute_cd(string path);
+Message * execute_mkdir(std::string name);
 
-void send_file(string filename);
+Message * execute_cd(std::string path);
+
+void send_file(std::string filename);
 
 #endif

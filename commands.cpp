@@ -27,9 +27,9 @@ void execute_ls(bool local, string param)
 }
 
 
-void send_file(char * filename)
+void send_file(string filename)
 {
-    FILE * f = fopen(filename, "r");
+    FILE * f = fopen(&filename[0], "r");
     send_stream(f);
     fclose(f);
 }

@@ -41,6 +41,6 @@ void send_stream(FILE * stream);
 void print_stream(FILE * stream);
 
 // envia comando para o servidor
-void send_command(int opt, string param);
+void send_command(int opt, std::string param);
 
 #endif

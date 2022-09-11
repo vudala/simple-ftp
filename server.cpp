@@ -34,7 +34,7 @@ int main(int argc, char * argv[]) {
             // lista os arquivos no server
             command = "ls ";
             command.append(string(msg->data));
-            FILE * f = popen(&command[0], "r");
+            f = popen(&command[0], "r");
             send_stream(f);
             fclose(f);
             break;

@@ -54,7 +54,7 @@ int main(int argc, char * argv[]) {
     }
     if (str_op == "put") {
         send_command(PUT, param);
-        send_file(&param[0]);
+        send_file(param);
     }
     if (str_op == "mkdir") {
         if (Local) {
