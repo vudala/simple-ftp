@@ -1,6 +1,8 @@
 #ifndef MESSAGE_INCLUDED
 #define MESSAGE_INCLUDED
 
+#include <bits/stdc++.h>
+
 #define MARKER 0b01111110
 
 enum Commands {
@@ -39,5 +41,7 @@ typedef struct __attribute__ ((__packed__)) Message {
 Message * new_msg(unsigned size, unsigned seq, unsigned type, char * data);
 
 bool valid_msg(Message * m);
+
+std::string data_to_str(Message * m);
 
 #endif

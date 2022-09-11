@@ -27,13 +27,13 @@ int main(int argc, char * argv[]) {
 
 
     cout << "Bem vindo ao SimpleFTP do vudala\n\n";
-    cout << "Comando disponiveis:\n\n";
-    cout << "ls     { ,-l,-a,-la}\n\n";
-    cout << "cd     {path}\n\n";
-    cout << "get    {filename}\n\n";
-    cout << "put    {filename}\n\n";
-    cout << "mkdir  {dirname}\n\n";
-    cout << "env    # troca de ambiente\n\n";
+    cout << "Comando disponiveis:\n";
+    cout << "ls     { ,-l,-a,-la}\n";
+    cout << "cd     {path}\n";
+    cout << "get    {filename}\n";
+    cout << "put    {filename}\n";
+    cout << "mkdir  {dirname}\n";
+    cout << "env    # troca de ambiente\n";
     cout << "close  # encerra o cliente\n";
 
     while(1) {
@@ -74,41 +74,36 @@ int main(int argc, char * argv[]) {
                 recv_stream(ofstream(), true);
             }
         }
-        if (str_op == "cd") {
+        else if (str_op == "cd") {
             if (Local)
                 execute_cd(param);
-            else {
+            else
                 send_command(CD, param);
-            }
         }
-        if (str_op == "get") {
+        else if (str_op == "get") {
             if (param.length() > 0 && Local) {
                 send_command(GET, param);
                 recv_stream(ofstream(param, ios_base::app), false);
             }
         }
-        if (str_op == "put" && Local) {
+        else if (str_op == "put" && Local) {
             if (param.length() > 0) {
                 send_command(PUT, param);
                 send_file(param);
             }
         }
-        if (str_op == "mkdir") {
+        else if (str_op == "mkdir") {
             if (param.length() > 0) {
-                if (Local) {
-                    Message * m = execute_mkdir(&param[0]);
-                    if (m)
-                        cout << string(m->data);
-                }
-                else {
+                if (Local)
+                    execute_mkdir(&param[0]);
+                else
                     send_command(MKDIR, param);
-                }
             }
         }
-        if (str_op == "env") {
+        else if (str_op == "env") {
             Local = !Local;
         }
-        if (str_op == "close")
+        else if (str_op == "close")
             exit(0);
     }
 }

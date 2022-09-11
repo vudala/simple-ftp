@@ -2,6 +2,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 int _crc(Message * m)
 {
@@ -24,4 +27,14 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 bool valid_msg(Message * m)
 {
     return _crc(m) == m->crc;
+}
+
+
+string data_to_str(Message * m)
+{
+    string str;
+    for(int i = 0; i < m->size; i++)
+        str.push_back(m->data[i]);
+    str.push_back('\0');
+    return str;
 }

@@ -198,6 +198,8 @@ void recv_stream(ofstream output, bool standard_out)
 
         free(msg);
     } while(status != FIM);
+
+    output.close();
 }
 
 

@@ -4,7 +4,6 @@
 
 #include <bits/stdc++.h>
 
-
 using namespace std;
 
 char * Interface;
@@ -28,38 +27,41 @@ int main(int argc, char * argv[]) {
         FILE * f;
         Message * result = NULL;
         string command;
-        msg->data[msg->size] = '\0';
+        ofstream ofs;
         switch (msg->type)
         {
         case LS:
             // lista os arquivos no server
             command = "ls ";
-            command.append(string(msg->data));
+            command.append(data_to_str(msg));
             f = popen(&command[0], "r");
             send_stream(f);
             fclose(f);
             break;
         case CD:
             // muda de pasta no server
-            execute_cd(string(msg->data));
+            command = data_to_str(msg);
+            execute_cd(command);
             break;
         case GET:
             // envia um arquivo para o client
-            f = fopen(msg->data, "r");
+            command = data_to_str(msg);
+            f = fopen(&command[0], "r");
             send_stream(f);
             fclose(f);
             break;
         case PUT:
             // recebe um arquivo do client
-            recv_stream(ofstream(msg->data, ios_base::app), false);
+            command = data_to_str(msg);
+            recv_stream(ofstream(&command[0], ios_base::app), false);
             break;
         case MKDIR:
             // cria uma pasta no servidor
-            result = execute_mkdir(msg->data);
-            if (result)
-                assert_send(result);
+            command = data_to_str(msg);
+            execute_mkdir(command);
             break;
         case PWD:
+            // envia o diretorio atual
             f = popen("echo -n $PWD" , "r");
             send_stream(f);
             fclose(f);
