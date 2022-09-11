@@ -21,6 +21,8 @@ int main(int argc, char * argv[]) {
     init_con();
 
     while(1) {
+        if (Local) cout << "LOCAL -> ";
+        else cout << "REMOTO -> ";
         cout << filesystem::current_path() << ": ";
 
         cin.clear();
