@@ -88,6 +88,7 @@ int main(int argc, char * argv[]) {
         }
         else if (str_op == "put" && Local) {
             if (filesystem::exists(param)) {
+                send_command(PUT, param);
                 FILE * f = fopen(&param[0], "r");
                 send_stream(f);
                 fclose(f);
