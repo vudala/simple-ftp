@@ -87,9 +87,10 @@ int main(int argc, char * argv[]) {
             }
         }
         else if (str_op == "put" && Local) {
-            if (param.length() > 0) {
-                send_command(PUT, param);
-                send_file(param);
+            if (filesystem::exists(param)) {
+                FILE * f = fopen(&param[0], "r");
+                send_stream(f);
+                fclose(f);
             }
         }
         else if (str_op == "mkdir") {
