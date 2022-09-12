@@ -83,13 +83,13 @@ int main(int argc, char * argv[]) {
         else if (str_op == "get") {
             if (param.length() > 0 && Local) {
                 send_command(GET, param);
-                recv_stream(ofstream(param, ios_base::app), false);
+                recv_stream(ofstream(param, ios::app | ios::binary | ios::ate), false);
             }
         }
         else if (str_op == "put" && Local) {
             if (filesystem::exists(param)) {
                 send_command(PUT, param);
-                FILE * f = fopen(&param[0], "r");
+                FILE * f = fopen(&param[0], "rb");
                 send_stream(f);
                 fclose(f);
             }
