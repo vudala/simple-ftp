@@ -159,7 +159,7 @@ void send_stream(FILE * stream)
             type = FIM;
 
         // envia os dados
-        msg = new Message(bytes_read - 1, seq, type, buffer);
+        msg = new Message(bytes_read, seq, type, buffer);
         assert_send(msg);
         free(msg);
 
@@ -180,7 +180,6 @@ void recv_stream(ofstream output, bool standard_out)
         status = msg->type;
 
         if (msg->seq == seq) {
-            cout << msg->size << '\n';
             for(int i = 0; i <= msg->size; i++) {
                 if (standard_out)
                     cout << msg->data[i] << flush;

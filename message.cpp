@@ -16,7 +16,7 @@ Message::Message() {}
 Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 {
     this->mark = MARKER;
-    this->size = size;
+    this->size = size - 1;
     this->seq = seq;
     this->type = type;
     if (data)
