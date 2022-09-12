@@ -21,13 +21,6 @@ int sockfd;
 
 bool Interrupted = false;
 
-
-int get_sockfd()
-{
-    return sockfd;
-}
-
-
 void inthandler(int sig)
 {
     int t = 1;
@@ -89,7 +82,7 @@ void send_ack(unsigned seq)
 {
     Message * m = new Message(0, seq, ACK, NULL);
     send_msg(m);
-    delete m;
+    free(m);
 }
 
 
@@ -97,7 +90,7 @@ void send_nack(unsigned seq)
 {
     Message * m = new Message(0, seq, NACK, NULL);
     send_msg(m);
-    delete m;
+    free(m);
 }
 
 
@@ -105,7 +98,7 @@ void send_ok(unsigned seq)
 {
     Message * m = new Message(0, seq, OK, NULL);
     send_msg(m);
-    delete m;
+    free(m);
 }
 
 
@@ -132,7 +125,7 @@ Message * assert_recv(unsigned seq)
 {
     Message * msg = fetch_msg(false);
     while(!valid_msg(msg)) {
-        delete msg;
+        free(msg);
         send_nack(seq);
         msg = fetch_msg(false);
     }
@@ -219,14 +212,17 @@ void print_stream(FILE * stream)
 void send_command(int opt, string param)
 {
     // manda a mensagem e fica esperando uma resposta
-    Message * msg = new Message(param.length(), 0, opt, &param[0]);
+    Message * msg;
+    if (param.length() > 0)
+        msg = new Message(param.length(), 0, opt, &param[0]);
+    else
+        msg = new Message(0, 0, opt, NULL);
+        
     Message * answer = NULL;
     do {
         send_msg(msg);
-        delete answer;
         answer = fetch_msg(true);
     } while(!answer || !valid_msg(answer) || msg->type == NACK);
-
-    delete msg;
-    delete answer;
+    free(msg);
+    free(answer);
 }

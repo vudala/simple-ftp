@@ -10,9 +10,6 @@
 // inicializa estruturas
 void init_con();
 
-// retorna o fd
-int get_sockfd();
-
 // recebe uma mensagem com opcao de timeout
 Message * fetch_msg(bool tout);
 
