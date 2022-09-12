@@ -6,9 +6,12 @@
 
 using namespace std;
 
-int _crc(Message * m)
+unsigned char _crc(Message * m)
 {
-    return 1;
+    unsigned char ret = 0x0;
+    for(int i = 0; i < m->size; i++)
+        ret ^= m->data[i];
+    return ret;
 }
 
 Message::Message() {}
@@ -34,7 +37,7 @@ string data_to_str(Message * m)
 {
     string str;
     for(int i = 0; i < m->size; i++)
-        str.push_back(m->data[i]);
+        str.push_back((char) m->data[i]);
     str.push_back('\0');
     return str;
 }
