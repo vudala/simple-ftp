@@ -42,14 +42,14 @@ int main(int argc, char * argv[]) {
             cout << "\n[LOCAL] ";
             FILE * f = popen("echo -n $PWD", "r");
             print_stream(f);
-            cout << ": ";
+            cout << ": " << flush;
             fclose(f);
         }
         else {
             cout << "\n[REMOTO] ";
             send_command(PWD, string());
             recv_stream(string(), true);
-            cout << ": ";
+            cout << ": " << flush;
         }
 
         cin.clear();

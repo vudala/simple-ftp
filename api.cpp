@@ -117,7 +117,7 @@ void assert_send(Message * msg)
     do {
         send_msg(msg);
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || msg->type == NACK || answer->seq != msg->seq);
+    } while(!answer || !valid_msg(answer) || msg->type == NACK);
 }
 
 
@@ -187,7 +187,7 @@ void recv_stream(string filename, bool standard_out)
             seq = (seq + 1) % 16;
         }
         // se recebeu a anterior, significa que o ack nao chegou no destino
-        else
+        else if (msg->seq == last_seq)
             send_ack(last_seq);
 
         free(msg);
