@@ -192,8 +192,9 @@ void recv_stream(string filename, bool standard_out)
 
         free(msg);
     } while(status != FIM);
-
-    fclose(f);
+    
+    if (f)
+        fclose(f);
 }
 
 
