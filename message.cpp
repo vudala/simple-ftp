@@ -16,11 +16,11 @@ Message::Message() {}
 Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 {
     this->mark = MARKER;
-    this->size = size - 1;
+    this->size = size;
     this->seq = seq;
     this->type = type;
     if (data)
-        memcpy(&this->data, data, size);
+        memcpy(&this->data, data, size + 1);
     this->crc = _crc(this);
 }
 

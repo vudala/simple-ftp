@@ -141,7 +141,7 @@ void send_stream(FILE * stream)
     int type = DADOS;
 
     char c;
-    int bytes_read;
+    unsigned bytes_read;
     string str;
     while(type != FIM) {
         // le os bytes da stream
@@ -159,7 +159,7 @@ void send_stream(FILE * stream)
             type = FIM;
 
         // envia os dados
-        msg = new Message(bytes_read, seq, type, buffer);
+        msg = new Message(bytes_read - 1, seq, type, buffer);
         assert_send(msg);
         free(msg);
 
@@ -182,7 +182,7 @@ void recv_stream(ofstream output, bool standard_out)
         if (msg->seq == seq) {
             for(int i = 0; i <= msg->size; i++) {
                 if (standard_out)
-                    cout << msg->data[i] << flush;
+                    cout << msg->data[i];
                 else 
                     output << msg->data[i];
             }
@@ -216,7 +216,12 @@ void print_stream(FILE * stream)
 void send_command(int opt, string param)
 {
     // manda a mensagem e fica esperando uma resposta
-    Message * msg = new Message(param.length(), 0, opt, &param[0]);
+    Message * msg;
+    if (param.length() > 0)
+        msg = new Message(param.length(), 0, opt, &param[0]);
+    else
+        msg = new Message(0, 0, opt, NULL);
+        
     Message * answer = NULL;
     do {
         send_msg(msg);
