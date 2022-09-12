@@ -46,7 +46,7 @@ int main(int argc, char * argv[]) {
         case GET:
             // envia um arquivo para o client
             command = data_to_str(msg);
-            if (!filesystem::exists(command)) {
+            if (filesystem::exists(command)) {
                 f = fopen(&command[0], "r");
                 send_stream(f);
                 fclose(f);
@@ -55,10 +55,10 @@ int main(int argc, char * argv[]) {
         case PUT:
             // recebe um arquivo do client
             command = data_to_str(msg);
-            if (!filesystem::exists(command))
-                recv_stream(ofstream(command, ios::app | ios::out | ios::ate), false);
-            else
-                assert_send(new Message(0, 0, FIM, NULL));
+//            if (!filesystem::exists(command))
+                recv_stream(ofstream(command, ios::app | ios::out | ios::ate), true);
+            // else
+            //     assert_send(new Message(0, 0, FIM, NULL));
             break;
         case MKDIR:
             // cria uma pasta no servidor
