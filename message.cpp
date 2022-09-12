@@ -20,7 +20,7 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
     this->seq = seq;
     this->type = type;
     if (data)
-        memcpy(&this->data, data, size + 1);
+        memcpy(&this->data, data, size);
     this->crc = _crc(this);
 }
 
@@ -33,7 +33,7 @@ bool valid_msg(Message * m)
 string data_to_str(Message * m)
 {
     string str;
-    for(int i = 0; i <= m->size; i++)
+    for(int i = 0; i < m->size; i++)
         str.push_back(m->data[i]);
     str.push_back('\0');
     return str;

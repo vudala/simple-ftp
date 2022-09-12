@@ -135,7 +135,7 @@ Message * assert_recv(unsigned seq)
 
 void send_stream(FILE * stream)
 {
-    char buffer[64];
+    char buffer[63];
     Message * msg = NULL;
     unsigned seq = 0;
     int type = DADOS;
@@ -144,14 +144,14 @@ void send_stream(FILE * stream)
     string str;
     while(type != FIM) {
         // le os bytes da stream
-        bytes_read = fread(buffer, 1, 64, stream);
+        bytes_read = fread(buffer, 1, 63, stream);
         
         // se leu tudo, marca como fim
         if (feof(stream))
             type = FIM;
 
         // envia os dados
-        msg = new Message(bytes_read - 1, seq, type, buffer);
+        msg = new Message(bytes_read, seq, type, buffer);
         assert_send(msg);
         free(msg);
 
@@ -179,7 +179,7 @@ void recv_stream(string filename, bool standard_out)
             if (standard_out)
                 cout << data_to_str(msg);
             else
-                fwrite(msg->data, 1, msg->size + 1, f);
+                fwrite(msg->data, 1, msg->size, f);
 
             send_ack(seq);
 
@@ -192,7 +192,7 @@ void recv_stream(string filename, bool standard_out)
 
         free(msg);
     } while(status != FIM);
-    
+
     if (f)
         fclose(f);
 }

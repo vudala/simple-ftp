@@ -18,12 +18,12 @@ enum Commands {
 
 enum Control {
     OK = 0b000001,
+    ERROR = 0b010001,
     ACK = 0b000011,
     NACK = 0b000010,
-    ERROR = 0b010001,
+    DADOS = 0b100000,
     FIM = 0b101110,
     DESCRITOR = 0b011000,
-    DADOS = 0b100000,
 };
 
 
@@ -32,7 +32,7 @@ typedef struct __attribute__ ((__packed__)) Message {
     unsigned    size:6;        // tamanho: 6 bits
     unsigned    seq:4;         // sequencia: 4 bits
     unsigned    type:6;        // tipo: 6 bits
-    char        data[64];      // dados: size bytes
+    char        data[63];      // dados: size bytes
     unsigned    crc:8;         // crc: 8 bits
     Message();
     Message(unsigned size, unsigned seq, unsigned type, char * data);
