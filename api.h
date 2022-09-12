@@ -5,7 +5,7 @@
 
 #include <bits/stdc++.h>
 
-#define TIMEOUT_SECONDS 1
+#define TIMEOUT_SECONDS 2
 
 // inicializa estruturas
 void init_con();
