@@ -6,9 +6,12 @@
 
 using namespace std;
 
-int _crc(Message * m)
+char _crc(Message * msg)
 {
-    return 1;
+    char res = 0x0;
+    for(int i = 0; i < msg->size; i++)
+        res ^= msg->data[i];
+    return res;
 }
 
 Message::Message() {}

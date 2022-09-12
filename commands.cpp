@@ -27,26 +27,16 @@ void execute_ls(bool local, string param)
 }
 
 
-void send_file(string filename)
-{
-    FILE * f = fopen(&filename[0], "r");
-    send_stream(f);
-    fclose(f);
-}
-
-
 Message * execute_cd(string path)
 {
     errno = 0;
     int ret = chdir(&path[0]);
     if (ret == -1) {
         switch (errno) {
+            case ENOENT:
+                return new Message(21, 0, ERROR, (char*) "Path does not exist\n");
             case EACCES:
-                return new Message(26, 0, ERROR, (char*) "Sem permissao de leitura\n");
-            case ELOOP:
-                return new Message(20, 0, ERROR, (char*) "Muitos links simbolicos\n");
-            case ENAMETOOLONG:
-                return new Message(27, 0, ERROR, (char*) "Caminho muito longo\n");
+                return new Message(19, 0, ERROR, (char*) "Permission denied\n");
         }
     }
     return NULL;
@@ -60,11 +50,9 @@ Message * execute_mkdir(string name)
     if (ret == -1) {
         switch (errno) {
             case EACCES :
-                return new Message(26, 0, ERROR, (char*) "Sem permissao de escrita\n");
+                return new Message(19, 0, ERROR, (char*) "Permission denied\n");
             case EEXIST:
-                return new Message(20, 0, ERROR, (char*) "Pasta ja existente\n");
-            case ENAMETOOLONG:
-                return new Message(27, 0, ERROR, (char*) "Nome de pasta muito longo\n");
+                return new Message(20, 0, ERROR, (char*) "Dir already exists\n");
         }
     }
     return NULL;

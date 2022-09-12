@@ -11,6 +11,4 @@ Message * execute_mkdir(std::string name);
 
 Message * execute_cd(std::string path);
 
-void send_file(std::string filename);
-
 #endif
