@@ -25,6 +25,7 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
+    srand(time(NULL));
 
     cout << "Bem vindo ao SimpleFTP do vudala\n\n";
     cout << "Comando disponiveis:\n";

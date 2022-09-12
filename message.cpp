@@ -29,6 +29,13 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
 
 bool valid_msg(Message * m)
 {
+    if ((rand() % 10) == 9) {
+        cout << "erro ";
+        return false;
+    }
+    else {
+        return true;
+    }
     return _crc(m) == m->crc;
 }
 

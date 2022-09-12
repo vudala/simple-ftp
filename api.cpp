@@ -187,7 +187,7 @@ void recv_stream(string filename, bool standard_out)
             seq = (seq + 1) % 16;
         }
         // se recebeu a anterior, significa que o ack nao chegou no destino
-        else if (msg->seq == last_seq)
+        else
             send_ack(last_seq);
 
         free(msg);
