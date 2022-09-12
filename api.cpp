@@ -139,20 +139,12 @@ void send_stream(FILE * stream)
     Message * msg = NULL;
     unsigned seq = 0;
     int type = DADOS;
-
-    char c;
     unsigned bytes_read;
+
     string str;
     while(type != FIM) {
         // le os bytes da stream
-        bytes_read = 0;
-        c = fgetc(stream);
-        while(c != EOF && bytes_read < 64) {
-            buffer[bytes_read] = c;
-            bytes_read++;
-            if (bytes_read < 64)
-                c = fgetc(stream);
-        }
+        bytes_read = fread(buffer, 1, 64, stream);
         
         // se leu tudo, marca como fim
         if (feof(stream))
@@ -168,24 +160,27 @@ void send_stream(FILE * stream)
 }
 
 
-void recv_stream(ofstream output, bool standard_out)
+void recv_stream(string filename, bool standard_out)
 {
     Message * msg = NULL;
     unsigned last_seq = 1987654321;
     unsigned seq = 0;
     int status = DADOS;
 
+    FILE * f = NULL;
+    if (!standard_out)
+        f = fopen(&filename[0], "wb");
+
     do {
         msg = assert_recv(seq);
         status = msg->type;
 
         if (msg->seq == seq) {
-            for(int i = 0; i <= msg->size; i++) {
-                if (standard_out)
-                    cout << msg->data[i];
-                else 
-                    output << msg->data[i];
-            }
+            if (standard_out)
+                cout << data_to_str(msg);
+            else
+                fwrite(msg->data, 1, msg->size + 1, f);
+
             send_ack(seq);
 
             last_seq = seq;
@@ -198,7 +193,7 @@ void recv_stream(ofstream output, bool standard_out)
         free(msg);
     } while(status != FIM);
 
-    output.close();
+    fclose(f);
 }
 
 

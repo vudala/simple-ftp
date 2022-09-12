@@ -47,7 +47,7 @@ int main(int argc, char * argv[]) {
         else {
             cout << "\n[REMOTO] ";
             send_command(PWD, string());
-            recv_stream(ofstream(), true);
+            recv_stream(string(), true);
             cout << ": ";
         }
 
@@ -71,7 +71,7 @@ int main(int argc, char * argv[]) {
             }
             else {
                 send_command(LS, param);
-                recv_stream(ofstream(), true);
+                recv_stream(string(), true);
             }
         }
         else if (str_op == "cd") {
@@ -83,7 +83,7 @@ int main(int argc, char * argv[]) {
         else if (str_op == "get") {
             if (param.length() > 0 && Local) {
                 send_command(GET, param);
-                recv_stream(ofstream(param, ios::app | ios::binary | ios::ate), false);
+                recv_stream(param, false);
             }
         }
         else if (str_op == "put" && Local) {

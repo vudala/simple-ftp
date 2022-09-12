@@ -25,43 +25,42 @@ int main(int argc, char * argv[]) {
         
         // faz a operacao
         FILE * f;
-        Message * result = NULL;
-        string command;
+        string param;
         ofstream ofs;
         switch (msg->type)
         {
         case LS:
             // lista os arquivos no server
-            command = "ls ";
-            command.append(data_to_str(msg));
-            f = popen(&command[0], "r");
+            param = "ls ";
+            param.append(data_to_str(msg));
+            f = popen(&param[0], "r");
             send_stream(f);
             fclose(f);
             break;
         case CD:
             // muda de pasta no server
-            command = data_to_str(msg);
-            execute_cd(command);
+            param = data_to_str(msg);
+            execute_cd(param);
             break;
         case GET:
             // envia um arquivo para o client
-            command = data_to_str(msg);
-            if (filesystem::exists(command)) {
-                f = fopen(&command[0], "rb");
+            param = data_to_str(msg);
+            if (filesystem::exists(param)) {
+                f = fopen(&param[0], "rb");
                 send_stream(f);
                 fclose(f);
             }
             break;
         case PUT:
             // recebe um arquivo do client
-            command = data_to_str(msg);
-            if (!filesystem::exists(command))
-                recv_stream(ofstream(command, ios::app | ios::binary | ios::ate), false);
+            param = data_to_str(msg);
+            if (!filesystem::exists(param))
+                recv_stream(param, false);
             break;
         case MKDIR:
             // cria uma pasta no servidor
-            command = data_to_str(msg);
-            execute_mkdir(command);
+            param = data_to_str(msg);
+            execute_mkdir(param);
             break;
         case PWD:
             // envia o diretorio atual
