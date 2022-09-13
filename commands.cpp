@@ -58,14 +58,17 @@ void execute_get(string param)
     if (ans->type == DESCRITOR) {
         unsigned long long fsize;
         memcpy(&fsize, ans->data, 8);
-        cout << fsize << '\n';
 
+        unsigned long long av = available_space();
+        
         // se tem espaco pra receber o arquivo
-        if (fsize <= available_space()) {
+        if (fsize <= av) {
             // informa que esta apto a receber e começa a requistar uma stream de dados
             ans = new Message(0, 0, OK, NULL);
             assert_send(ans);
             delete ans;
+
+            // comeca a receber a stream
             recv_stream(param, false);
         }
         // se nao tem, dispara um erro informando que o servidor nao deve enviar nada

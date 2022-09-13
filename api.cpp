@@ -146,6 +146,7 @@ void send_stream(FILE * stream)
     int type = DADOS;
     unsigned bytes_read;
 
+    long long sum = 0;
     string str;
     while(type != FIM) {
         // le os bytes da stream
@@ -158,10 +159,13 @@ void send_stream(FILE * stream)
         // envia os dados
         msg = new Message(bytes_read, seq, type, buffer);
         assert_send(msg);
+        sum += bytes_read;
+        cout << "enviou " << msg->seq << "\n" << flush;
         free(msg);
 
         seq = (seq + 1) % 16;
     }
+    cout << sum << " bytes enviados\n" << flush;
 }
 
 
@@ -185,6 +189,8 @@ void recv_stream(string filename, bool standard_out)
                 cout << data_to_str(msg) << flush;
             else
                 fwrite(msg->data, 1, msg->size, f);
+
+            cout << "recebeu " << msg->seq << "\n" << flush;
 
             send_ack(seq);
 

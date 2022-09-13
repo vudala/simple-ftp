@@ -15,11 +15,8 @@ unsigned long long filesize(string filename)
 unsigned long long available_space()
 {
     FILE * f = popen("tmp=$(df .); echo $tmp | cut -d' ' -f11", "r");
-    if (f) {
-        long res;
-        fscanf(f, "%ld", &res);
-        fclose(f);
-        return (unsigned long long) res;
-    }
-    return 0x0;
+    long res;
+    fscanf(f, "%ld", &res);
+    fclose(f);
+    return (unsigned long long) res;
 }
