@@ -10,6 +10,9 @@
 // inicializa estruturas
 void init_con();
 
+// retorna o sockfd
+int getsockfd();
+
 // recebe uma mensagem com opcao de timeout
 Message * fetch_msg(bool tout);
 
@@ -42,5 +45,8 @@ void print_stream(FILE * stream);
 
 // envia comando para o servidor
 void send_command(int opt, std::string param);
+
+// 
+void read_garbage();
 
 #endif

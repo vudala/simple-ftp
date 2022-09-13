@@ -7,7 +7,9 @@
 #include <sys/socket.h>
 #include <bits/stdc++.h>
 #include <stdlib.h>
+#include <poll.h>
 #include <unistd.h>
+
 using namespace std;
 
 char * Interface;
@@ -20,12 +22,33 @@ vector<string> ls_opts = {
 };
 
 
+void print_path()
+{
+    if (Local) {
+        cout << "\n[LOCAL] ";
+        FILE * f = popen("echo -n $PWD", "r");
+        print_stream(f);
+        cout << ": " << flush;
+        fclose(f);
+    }
+    else {
+        cout << "\n[REMOTO] ";
+        send_command(PWD, string());
+        recv_stream(string(), true);
+        cout << ": " << flush;
+    }
+}
+
+
 int main(int argc, char * argv[]) {
     Interface = argv[1];
 
     init_con();
 
-    srand(time(NULL));
+    struct pollfd descriptors[2] = {
+        {.fd = 0, .events = POLLIN, .revents = 0},
+        {.fd = getsockfd(), .events = POLLIN, .revents = 0}
+    };
 
     cout << "Bem vindo ao SimpleFTP do vudala\n\n";
     cout << "Comando disponiveis:\n";
@@ -37,22 +60,14 @@ int main(int argc, char * argv[]) {
     cout << "env    # troca de ambiente\n";
     cout << "close  # encerra o cliente\n";
 
-    while(1) {
-        if (Local) {
-            cout << "\n[LOCAL] ";
-            FILE * f = popen("echo -n $PWD", "r");
-            print_stream(f);
-            cout << ": " << flush;
-            fclose(f);
-        }
-        else {
-            cout << "\n[REMOTO] ";
-            send_command(PWD, string());
-            recv_stream(string(), true);
-            cout << ": " << flush;
-        }
+    print_path();
 
-        cin.clear();
+    while(1) {
+        poll(descriptors, 2, -1);
+        if(descriptors[1].revents & POLLIN){
+            read_garbage();
+        }
+        else if(descriptors[0].revents & POLLIN){
 
         string buff;
         getline(cin, buff);
@@ -108,5 +123,7 @@ int main(int argc, char * argv[]) {
         }
         else if (str_op == "close")
             exit(0);
+        print_path();
+        }
     }
 }

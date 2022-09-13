@@ -53,6 +53,11 @@ void init_con()
 }
 
 
+int getsockfd()
+{
+    return sockfd;
+}
+
 Message * fetch_msg(bool tout)
 {
     Message * m = new Message();
@@ -225,4 +230,17 @@ void send_command(int opt, string param)
     } while(!answer || !valid_msg(answer) || msg->type == NACK);
     free(msg);
     free(answer);
+}
+
+
+void read_garbage()
+{
+    Message * m = new Message();
+    recv(getsockfd(), m, sizeof(Message), 0);
+    if (m->mark == MARKER)
+        if (!valid_msg(m))
+            send_nack(m->seq);
+        else
+            send_ack(m->seq);
+    delete m;
 }

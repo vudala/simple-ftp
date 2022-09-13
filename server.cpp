@@ -3,6 +3,9 @@
 #include "commands.h"
 
 #include <bits/stdc++.h>
+#include <poll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 using namespace std;
 
@@ -13,7 +16,17 @@ int main(int argc, char * argv[]) {
 
     init_con();
 
+    struct pollfd descriptors[2] = {
+        {.fd = 0, .events = POLLIN, .revents = 0},
+        {.fd = getsockfd(), .events = POLLIN, .revents = 0}
+    };
+
     while(1) {
+        poll(descriptors, 2, -1);
+        if(descriptors[1].revents & POLLIN){
+            read_garbage();
+        }
+        else if(descriptors[0].revents & POLLIN){
         // recebe uma mensagem
         Message * msg = fetch_msg(false);
         while(!valid_msg(msg)) {
@@ -74,6 +87,7 @@ int main(int argc, char * argv[]) {
         default:
             // faz nada
             break;
+        }
         }
     }
 }
