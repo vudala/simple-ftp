@@ -76,6 +76,6 @@ Message * build_descriptor(unsigned long long filesize)
 {
     char buff[8];
     memcpy(buff, &filesize, 8);
-    Message * msg = new Message(4, 0, DESCRITOR, buff);
+    Message * msg = new Message(8, 0, DESCRITOR, buff);
     return msg;
 }
