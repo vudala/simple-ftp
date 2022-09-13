@@ -41,7 +41,7 @@ Message * execute_mkdir(string name)
             case EACCES :
                 return new Message(26, 0, ERROR, (char*) "Sem permissao de escrita\n");
             case EEXIST:
-                return new Message(20, 0, ERROR, (char*) "Pasta ja existente\n");
+                return new Message(21, 0, ERROR, (char*) "Diretorio ja existe\n");
             case ENAMETOOLONG:
                 return new Message(27, 0, ERROR, (char*) "Nome de pasta muito longo\n");
         }
@@ -54,24 +54,29 @@ void execute_get(string param)
 {
     send_command(GET, param);
     Message * ans = assert_recv(0);
-    // RECEBE DESCRIPTOR
+    // recebe descritor
     if (ans->type == DESCRITOR) {
         unsigned long long fsize;
         memcpy(&fsize, ans->data, 8);
+        cout << fsize << '\n';
 
         // se tem espaco pra receber o arquivo
         if (fsize <= available_space()) {
+            // informa que esta apto a receber e começa a requistar uma stream de dados
             ans = new Message(0, 0, OK, NULL);
             assert_send(ans);
+            delete ans;
             recv_stream(param, false);
         }
+        // se nao tem, dispara um erro informando que o servidor nao deve enviar nada
         else {
             cout << "Sem espaço suficiente para receber o arquivo HAHAHAHAHAHA\n" << flush;
-            Message * ans = new Message(0, 0, ERROR, NULL);
+            ans = new Message(0, 0, ERROR, NULL);
             assert_send(ans);
             delete ans;
         }
     }
+    // se recebeu um erro, o arquivo nao existe
     else {
         cout << "Arquivo inexistente\n" << flush;
     }

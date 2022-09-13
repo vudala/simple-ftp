@@ -66,10 +66,22 @@ int main(int argc, char * argv[]) {
             }
             break;
         case PUT:
-            // recebe um arquivo do client
-            param = data_to_str(msg);
-            if (!filesystem::exists(param))
-                recv_stream(param, false);
+            result = assert_recv(0);
+            if (result->type == DESCRITOR) {
+                unsigned long long fsize;
+                memcpy(&fsize, ans->data, 8);
+                
+                if (fsize < available_space()) {
+                    ans = new Message(0, 0, OK, NULL);
+                    assert_send(ans);
+                    delete ans;
+                    recv_stream(param, false);
+                }
+                else {
+                    ans = new Message(0, 0, ERROR, NULL);
+                    assert_send(ans);
+                    delete ans;
+                }
             break;
         case MKDIR:
             // cria uma pasta no servidor

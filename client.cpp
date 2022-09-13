@@ -117,11 +117,29 @@ int main(int argc, char * argv[]) {
             execute_get(param);
         }
         else if (str_op == "put" && Local) {
+            // se o arquiv existe
             if (filesystem::exists(param)) {
+                // envia o tamanho dele pro servidor
                 send_command(PUT, param);
-                FILE * f = fopen(&param[0], "rb");
-                send_stream(f);
-                fclose(f);
+                Message * tos = build_descriptor(filesize(param));
+
+                assert_send(tos);
+                delete tos;
+
+                Message * ans = assert_recv(0);
+                // se o servidor tem capacidade de receber o arquivo
+                if (ans->type == OK) {
+                    FILE * f = fopen(&param[0], "rb");
+                    send_stream(f);
+                    fclose(f);
+                }
+                // se nao envia dispara erro
+                else {
+                    cout << "Servidor nao tem espaço para receber o arquivo\n";
+                }
+            }
+            else {
+                cout << "Arquivo nao existe\n" << flush;
             }
         }
         else if (str_op == "mkdir") {
