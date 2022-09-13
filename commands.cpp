@@ -18,6 +18,8 @@ Message * execute_cd(string path)
     int ret = chdir(&path[0]);
     if (ret == -1) {
         switch (errno) {
+            case ENOENT:
+                return new Message(23, 0, ERROR, (char*) "Diretorio inexistente\n");
             case EACCES:
                 return new Message(26, 0, ERROR, (char*) "Sem permissao de leitura\n");
             case ELOOP:
@@ -59,7 +61,8 @@ void execute_get(string param)
 
         // se tem espaco pra receber o arquivo
         if (fsize <= available_space()) {
-            send_ok(0);
+            ans = new Message(0, 0, OK, NULL);
+            assert_send(ans);
             recv_stream(param, false);
         }
         else {
@@ -70,6 +73,6 @@ void execute_get(string param)
         }
     }
     else {
-        cout << "Erro desconhecido\n" << flush;
+        cout << "Erro\n" << flush;
     }
 }

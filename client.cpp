@@ -93,11 +93,12 @@ int main(int argc, char * argv[]) {
             }
             else {
                 send_command(LS, param);
-                Message * ans = assert_recv(0);
-                if (ans->type == OK)
-                    recv_stream(string(), true);
-                else
-                    cout << data_to_str(ans) << flush;
+                recv_stream(string(), true);
+                // Message * ans = assert_recv(0);
+                // if (ans->type == OK)
+                    
+                // else
+                //     cout << data_to_str(ans) << flush;
             }
         }
         else if (str_op == "cd") {
@@ -105,9 +106,11 @@ int main(int argc, char * argv[]) {
                 execute_cd(param);
             else {
                 send_command(CD, param);
+                cout << "comando enviado\n" << flush;
                 Message * ans = assert_recv(0);
                 if (ans->type == ERROR)
                     cout << data_to_str(ans) << flush;
+                cout << "comando executado\n" << flush;
             }
         }
         else if (str_op == "get") {
