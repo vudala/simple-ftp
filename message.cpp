@@ -42,3 +42,12 @@ string data_to_str(Message * m)
     str.push_back('\0');
     return str;
 }
+
+
+Message * build_descriptor(unsigned long long filesize)
+{
+    char buff[8];
+    memcpy(buff, &filesize, 8);
+    Message * msg = new Message(4, 0, DESCRITOR, buff);
+    return msg;
+}

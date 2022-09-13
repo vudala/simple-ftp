@@ -226,10 +226,13 @@ void send_command(int opt, string param)
     Message * answer = NULL;
     do {
         send_msg(msg);
+        if (answer)
+            delete answer;
         answer = fetch_msg(true);
     } while(!answer || !valid_msg(answer) || msg->type == NACK);
-    free(msg);
-    free(answer);
+    
+    delete msg;
+    delete answer;
 }
 
 

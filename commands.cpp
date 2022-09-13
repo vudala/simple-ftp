@@ -2,6 +2,7 @@
 
 #include "message.h"
 #include "api.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <bits/stdc++.h>
@@ -10,30 +11,6 @@
 #include <errno.h>
 
 using namespace std;
-
-void execute_ls(bool local, string param)
-{
-    string command = "ls ";
-    command.append(param);
-    FILE * f = popen(&command[0], "r");
-    if (local)
-        print_stream(f);
-    else {
-        send_command(LS, param);
-        send_stream(f);
-    }
-        
-    fclose(f);
-}
-
-
-void send_file(string filename)
-{
-    FILE * f = fopen(&filename[0], "r");
-    send_stream(f);
-    fclose(f);
-}
-
 
 Message * execute_cd(string path)
 {
@@ -49,7 +26,7 @@ Message * execute_cd(string path)
                 return new Message(27, 0, ERROR, (char*) "Caminho muito longo\n");
         }
     }
-    return NULL;
+    return new Message(0, 0, OK, NULL);
 }
 
 
@@ -67,5 +44,32 @@ Message * execute_mkdir(string name)
                 return new Message(27, 0, ERROR, (char*) "Nome de pasta muito longo\n");
         }
     }
-    return NULL;
+    return new Message(0, 0, OK, NULL);
+}
+
+
+void execute_get(string param)
+{
+    send_command(GET, param);
+    Message * ans = assert_recv(0);
+    // RECEBE DESCRIPTOR
+    if (ans->type == DESCRITOR) {
+        unsigned long long fsize;
+        memcpy(&fsize, ans->data, 8);
+
+        // se tem espaco pra receber o arquivo
+        if (fsize <= available_space()) {
+            send_ok(0);
+            recv_stream(param, false);
+        }
+        else {
+            cout << "Sem espaço suficiente para receber o arquivo HAHAHAHAHAHA\n" << flush;
+            Message * ans = new Message(0, 0, ERROR, NULL);
+            assert_send(ans);
+            delete ans;
+        }
+    }
+    else {
+        cout << "Erro desconhecido\n" << flush;
+    }
 }

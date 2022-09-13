@@ -38,10 +38,13 @@ typedef struct __attribute__ ((__packed__)) Message {
     Message(unsigned size, unsigned seq, unsigned type, char * data);
 } Message;
 
+
 Message * new_msg(unsigned size, unsigned seq, unsigned type, char * data);
 
 bool valid_msg(Message * m);
 
 std::string data_to_str(Message * m);
+
+Message * build_descriptor(unsigned filesize);
 
 #endif

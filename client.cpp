@@ -2,6 +2,7 @@
 #include "api.h"
 #include "message.h"
 #include "commands.h"
+#include "utils.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -39,6 +40,18 @@ void print_path()
     }
 }
 
+void print_commands()
+{
+    cout << "\nComando disponiveis:\n";
+    cout << "ls     { ,-l,-a,-la}\n";
+    cout << "cd     {path}\n";
+    cout << "get    {filename}\n";
+    cout << "put    {filename}\n";
+    cout << "mkdir  {dirname}\n";
+    cout << "env    # troca de ambiente\n";
+    cout << "close  # encerra o cliente\n" << flush;
+}
+
 
 int main(int argc, char * argv[]) {
     Interface = argv[1];
@@ -50,24 +63,17 @@ int main(int argc, char * argv[]) {
         {.fd = getsockfd(), .events = POLLIN, .revents = 0}
     };
 
-    cout << "Bem vindo ao SimpleFTP do vudala\n\n";
-    cout << "Comando disponiveis:\n";
-    cout << "ls     { ,-l,-a,-la}\n";
-    cout << "cd     {path}\n";
-    cout << "get    {filename}\n";
-    cout << "put    {filename}\n";
-    cout << "mkdir  {dirname}\n";
-    cout << "env    # troca de ambiente\n";
-    cout << "close  # encerra o cliente\n";
+    cout << "Bem vindo ao SimpleFTP do vudala HAHAHAHAHAHAHAHAHAH\n\n";
+    print_commands();
 
     print_path();
 
     while(1) {
         poll(descriptors, 2, -1);
-        if(descriptors[1].revents & POLLIN){
+        if(descriptors[1].revents & POLLIN) {
             read_garbage();
         }
-        else if(descriptors[0].revents & POLLIN){
+        else if(descriptors[0].revents & POLLIN) {
 
         string buff;
         getline(cin, buff);
@@ -87,20 +93,25 @@ int main(int argc, char * argv[]) {
             }
             else {
                 send_command(LS, param);
-                recv_stream(string(), true);
+                Message * ans = assert_recv(0);
+                if (ans->type == OK)
+                    recv_stream(string(), true);
+                else
+                    cout << data_to_str(ans) << flush;
             }
         }
         else if (str_op == "cd") {
             if (Local)
                 execute_cd(param);
-            else
+            else {
                 send_command(CD, param);
+                Message * ans = assert_recv(0);
+                if (ans->type == ERROR)
+                    cout << data_to_str(ans) << flush;
+            }
         }
         else if (str_op == "get") {
-            if (param.length() > 0 && Local) {
-                send_command(GET, param);
-                recv_stream(param, false);
-            }
+            execute_get(param);
         }
         else if (str_op == "put" && Local) {
             if (filesystem::exists(param)) {
@@ -114,8 +125,12 @@ int main(int argc, char * argv[]) {
             if (param.length() > 0) {
                 if (Local)
                     execute_mkdir(&param[0]);
-                else
+                else {
                     send_command(MKDIR, param);
+                    Message * ans = assert_recv(0);
+                    if (ans->type == ERROR)
+                        cout << data_to_str(ans) << flush;      
+                }
             }
         }
         else if (str_op == "env") {
@@ -123,6 +138,7 @@ int main(int argc, char * argv[]) {
         }
         else if (str_op == "close")
             exit(0);
+
         print_path();
         }
     }

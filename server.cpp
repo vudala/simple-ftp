@@ -1,6 +1,7 @@
 
 #include "api.h"
 #include "commands.h"
+#include "utils.h"
 
 #include <bits/stdc++.h>
 
@@ -27,6 +28,8 @@ int main(int argc, char * argv[]) {
         FILE * f;
         string param;
         ofstream ofs;
+        Message * result = NULL;
+        Message * ans = NULL;
         switch (msg->type)
         {
         case LS:
@@ -40,15 +43,26 @@ int main(int argc, char * argv[]) {
         case CD:
             // muda de pasta no server
             param = data_to_str(msg);
-            execute_cd(param);
+            result = execute_cd(param);
+            assert_send(result);
+            delete result;
             break;
         case GET:
             // envia um arquivo para o client
             param = data_to_str(msg);
             if (filesystem::exists(param)) {
-                f = fopen(&param[0], "rb");
-                send_stream(f);
-                fclose(f);
+                ans = build_descriptor(filesize(param));
+                assert_send(ans);
+                ans = assert_recv(0);
+                if (ans->type == OK) {
+                    f = fopen(&param[0], "rb");
+                    send_stream(f);
+                    fclose(f);
+                }
+            }
+            else {
+                ans = new Message(21, 0, ERROR, "Arquivo inexistente\n");
+                assert_send(ans);
             }
             break;
         case PUT:
@@ -60,7 +74,8 @@ int main(int argc, char * argv[]) {
         case MKDIR:
             // cria uma pasta no servidor
             param = data_to_str(msg);
-            execute_mkdir(param);
+            result = execute_mkdir(param);
+            assert_send(result);
             break;
         case PWD:
             // envia o diretorio atual
