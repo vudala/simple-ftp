@@ -28,6 +28,7 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
     this->crc = _crc(this);
 }
 
+Mask::Mask() {}
 
 Mask::Mask (Message * msg)
 {
