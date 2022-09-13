@@ -237,10 +237,11 @@ void read_garbage()
 {
     Message * m = new Message();
     recv(getsockfd(), m, sizeof(Message), 0);
-    if (m->mark == MARKER)
+    if (m->mark == MARKER) {
         if (!valid_msg(m))
             send_nack(m->seq);
         else
             send_ack(m->seq);
+    }
     delete m;
 }
