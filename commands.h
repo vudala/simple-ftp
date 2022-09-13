@@ -9,6 +9,6 @@ Message * execute_mkdir(std::string name);
 
 Message * execute_cd(std::string path);
 
-void execute_get(string param);
+void execute_get(std::string param);
 
 #endif
