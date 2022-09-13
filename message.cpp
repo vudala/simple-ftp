@@ -28,6 +28,33 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
     this->crc = _crc(this);
 }
 
+
+Mask::Mask (Message * msg)
+{
+    this->mark = MARKER;
+    this->size = msg->size;
+    this->seq = msg->seq;
+    this->type = msg->type;
+    memset(this->data, 0x0, 504);
+    for(int i = 0; i < msg->size; i++)
+        this->data[i] = (unsigned long long) msg->data[i];
+    this->crc = msg->crc;
+}
+
+
+Message::Message (Mask * mask)
+{
+    this->mark = MARKER;
+    this->size = mask->size;
+    this->seq = mask->seq;
+    this->type = mask->type;
+    memset(this->data, 0x0, 63);
+    for(int i = 0; i < mask->size; i++)
+        this->data[i] = (unsigned char) mask->data[i];
+    this->crc = mask->crc;
+}
+
+
 bool valid_msg(Message * m)
 {
     return _crc(m) == m->crc;

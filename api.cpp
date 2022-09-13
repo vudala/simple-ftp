@@ -60,7 +60,7 @@ int getsockfd()
 
 Message * fetch_msg(bool tout)
 {
-    Message * m = new Message();
+    Mask * msk = new Mask();
 
     Interrupted = false;
 
@@ -68,18 +68,20 @@ Message * fetch_msg(bool tout)
         alarm(TIMEOUT_SECONDS);
     
     do {
-        if (recv(sockfd, m, sizeof(Message), 0) == -1) {
+        if (recv(sockfd, msk, sizeof(Mask), 0) == -1) {
             if (Interrupted)
                 return NULL;
             perror("recv: ");
             exit(-1);
         };
             
-    } while (m->mark != MARKER);
+    } while (msk->mark != MARKER);
 
     alarm(0);
 
-    return m;
+    Message * msg = new Message(msk);
+    delete msk;
+    return msg;
 }
 
 
@@ -87,7 +89,7 @@ void send_ack(unsigned seq)
 {
     Message * m = new Message(0, seq, ACK, NULL);
     send_msg(m);
-    free(m);
+    delete m;
 }
 
 
@@ -95,7 +97,7 @@ void send_nack(unsigned seq)
 {
     Message * m = new Message(0, seq, NACK, NULL);
     send_msg(m);
-    free(m);
+    delete m;
 }
 
 
@@ -103,16 +105,18 @@ void send_ok(unsigned seq)
 {
     Message * m = new Message(0, seq, OK, NULL);
     send_msg(m);
-    free(m);
+    delete m;
 }
 
 
 void send_msg(Message * msg)
 {
-    if (send(sockfd, (const char *) msg, sizeof(Message), 0) == -1) {
+    Mask * msk = new Mask(msg);
+    if (send(sockfd, (const char *) msk, sizeof(Mask), 0) == -1) {
         perror("send_msg: ");
         exit(-1);
     };
+    delete msk;
 }
 
 
@@ -130,7 +134,7 @@ Message * assert_recv(unsigned seq)
 {
     Message * msg = fetch_msg(false);
     while(!valid_msg(msg)) {
-        free(msg);
+        delete msg;
         send_nack(seq);
         msg = fetch_msg(false);
     }
@@ -161,7 +165,7 @@ void send_stream(FILE * stream)
         assert_send(msg);
         sum += bytes_read;
         cout << "enviou " << msg->seq << "\n" << flush;
-        free(msg);
+        delete msg;
 
         seq = (seq + 1) % 16;
     }
@@ -190,8 +194,6 @@ void recv_stream(string filename, bool standard_out)
             else
                 fwrite(msg->data, 1, msg->size, f);
 
-            cout << "recebeu " << msg->seq << "\n" << flush;
-
             send_ack(seq);
 
             last_seq = seq;
@@ -201,7 +203,7 @@ void recv_stream(string filename, bool standard_out)
         else if (msg->seq == last_seq)
             send_ack(last_seq);
 
-        free(msg);
+        delete msg;
     } while(status != FIM);
 
     if (f)
@@ -232,8 +234,7 @@ void send_command(int opt, string param)
     Message * answer = NULL;
     do {
         send_msg(msg);
-        if (answer)
-            delete answer;
+        if (answer) delete answer;
         answer = fetch_msg(true);
     } while(!answer || !valid_msg(answer) || msg->type == NACK);
     
@@ -244,13 +245,15 @@ void send_command(int opt, string param)
 
 void read_garbage()
 {
-    Message * m = new Message();
-    recv(getsockfd(), m, sizeof(Message), 0);
-    if (m->mark == MARKER) {
-        if (!valid_msg(m))
-            send_nack(m->seq);
+    Mask * msk = new Mask();
+    recv(getsockfd(), msk, sizeof(Mask), 0);
+    Message * msg = new Message(msk);
+    if (msg->mark == MARKER) {
+        if (!valid_msg(msg))
+            send_nack(msg->seq);
         else
-            send_ack(m->seq);
+            send_ack(msg->seq);
     }
-    delete m;
+    delete msg;
+    delete msk;
 }

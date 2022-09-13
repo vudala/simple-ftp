@@ -102,8 +102,12 @@ int main(int argc, char * argv[]) {
             }
         }
         else if (str_op == "cd") {
-            if (Local)
-                execute_cd(param);
+            if (Local) {
+                Message * res = execute_cd(param);
+                if (res->type == ERROR) {
+                    cout << data_to_str(res) << flush;
+                }
+            }   
             else {
                 send_command(CD, param);
                 cout << "comando enviado\n" << flush;
@@ -144,8 +148,12 @@ int main(int argc, char * argv[]) {
         }
         else if (str_op == "mkdir") {
             if (param.length() > 0) {
-                if (Local)
-                    execute_mkdir(&param[0]);
+                if (Local) {
+                    Message * res = execute_mkdir(param);
+                    if (res->type == ERROR) {
+                        cout << data_to_str(res) << flush;
+                    }
+                }   
                 else {
                     send_command(MKDIR, param);
                     Message * ans = assert_recv(0);

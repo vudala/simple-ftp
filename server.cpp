@@ -50,10 +50,14 @@ int main(int argc, char * argv[]) {
         case GET:
             // envia um arquivo para o client
             param = data_to_str(msg);
+            // verifica se o arquivo existe
             if (filesystem::exists(param)) {
                 ans = build_descriptor(filesize(param));
                 assert_send(ans);
+                // envia o descritor pro cliente
                 ans = assert_recv(0);
+
+                // se recebeu uma resposta positiva pra enviar
                 if (ans->type == OK) {
                     f = fopen(&param[0], "rb");
                     send_stream(f);
