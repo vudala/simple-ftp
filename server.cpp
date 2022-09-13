@@ -61,7 +61,7 @@ int main(int argc, char * argv[]) {
                 }
             }
             else {
-                ans = new Message(21, 0, ERROR, "Arquivo inexistente\n");
+                ans = new Message(21, 0, ERROR, (char *) "Arquivo inexistente\n");
                 assert_send(ans);
             }
             break;

@@ -45,6 +45,6 @@ bool valid_msg(Message * m);
 
 std::string data_to_str(Message * m);
 
-Message * build_descriptor(unsigned filesize);
+Message * build_descriptor(unsigned long long filesize);
 
 #endif
