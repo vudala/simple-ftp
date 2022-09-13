@@ -82,6 +82,7 @@ int main(int argc, char * argv[]) {
                     assert_send(ans);
                     delete ans;
                 }
+            }
             break;
         case MKDIR:
             // cria uma pasta no servidor
