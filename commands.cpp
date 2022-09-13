@@ -73,6 +73,6 @@ void execute_get(string param)
         }
     }
     else {
-        cout << "Erro\n" << flush;
+        cout << "Arquivo inexistente\n" << flush;
     }
 }

@@ -182,7 +182,7 @@ void recv_stream(string filename, bool standard_out)
 
         if (msg->seq == seq) {
             if (standard_out)
-                cout << data_to_str(msg);
+                cout << data_to_str(msg) << flush;
             else
                 fwrite(msg->data, 1, msg->size, f);
 
