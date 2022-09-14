@@ -23,7 +23,7 @@ Message::Message (unsigned size, unsigned seq, unsigned type, char * data)
     this->seq = seq;
     this->type = type;
     memset(this->data, 0x0, 63);
-    if (data)
+    if (data && size > 0)
         memcpy(&this->data, data, size);
     this->crc = _crc(this);
 }

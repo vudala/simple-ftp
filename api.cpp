@@ -195,6 +195,7 @@ void recv_stream(string filename, bool standard_out)
                 fwrite(msg->data, 1, msg->size, f);
 
             send_ack(seq);
+            cout << msg->size << " bytes recebidos\n" << flush; 
 
             last_seq = seq;
             seq = (seq + 1) % 16;
@@ -224,19 +225,14 @@ void print_stream(FILE * stream)
 
 void send_command(int opt, string param)
 {
-    // manda a mensagem e fica esperando uma resposta
-    Message * msg;
-    if (param.length() > 0)
-        msg = new Message(param.length(), 0, opt, &param[0]);
-    else
-        msg = new Message(0, 0, opt, NULL);
-        
+    Message * msg = new Message(param.length(), 0, opt, &param[0]);
+         
     Message * answer = NULL;
     do {
         send_msg(msg);
         if (answer) delete answer;
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || msg->type == NACK);
+    } while(!answer || !valid_msg(answer) || answer->type != ACK);
     
     delete msg;
     delete answer;

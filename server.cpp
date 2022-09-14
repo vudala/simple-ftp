@@ -18,7 +18,7 @@ int main(int argc, char * argv[]) {
         // recebe uma mensagem
         Message * msg = fetch_msg(false);
         while(!valid_msg(msg)) {
-            free(msg);
+            delete msg;
             send_nack(msg->seq);
             msg = fetch_msg(false);
         }
@@ -73,7 +73,7 @@ int main(int argc, char * argv[]) {
             result = assert_recv(0);
             if (result->type == DESCRITOR) {
                 unsigned long long fsize;
-                memcpy(&fsize, ans->data, 8);
+                memcpy(&fsize, result->data, 8);
                 
                 if (fsize < available_space()) {
                     ans = new Message(0, 0, OK, NULL);
