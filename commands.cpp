@@ -53,7 +53,9 @@ Message * execute_mkdir(string name)
 void execute_get(string param)
 {
     send_command(GET, param);
+
     Message * ans = assert_recv(0);
+    cout << "descritor recebido\n" << flush;
     // recebe descritor
     if (ans->type == DESCRITOR) {
         unsigned long long fsize;
@@ -64,9 +66,11 @@ void execute_get(string param)
         // se tem espaco pra receber o arquivo
         if (fsize <= av) {
             // informa que esta apto a receber e começa a requistar uma stream de dados
+            cout << "enviando controle\n" << flush; 
             ans = new Message(0, 0, OK, NULL);
             assert_send(ans);
             delete ans;
+            cout << "controle enviado\n" << flush; 
 
             // comeca a receber a stream
             recv_stream(param, false);
@@ -74,13 +78,17 @@ void execute_get(string param)
         // se nao tem, dispara um erro informando que o servidor nao deve enviar nada
         else {
             cout << "Sem espaço suficiente para receber o arquivo HAHAHAHAHAHA\n" << flush;
+            cout << "enviando controle\n" << flush; 
             ans = new Message(0, 0, ERROR, NULL);
+            cout << "controle enviado\n" << flush; 
             assert_send(ans);
             delete ans;
         }
     }
     // se recebeu um erro, o arquivo nao existe
     else {
+        cout << ans->type << "\n" << flush;
+        cout << "nao recebeu descritor\n" << flush;
         cout << data_to_str(ans) << flush;
     }
 }

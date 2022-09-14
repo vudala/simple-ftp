@@ -187,13 +187,14 @@ void recv_stream(string filename, bool standard_out)
 
     do {
         msg = assert_recv(seq);
-        status = msg->type;
-
+        
         if (msg->seq == seq) {
             if (standard_out)
                 cout << data_to_str(msg) << flush;
             else
                 fwrite(msg->data, 1, msg->size, f);
+
+            status = msg->type;
 
             send_ack(seq);
 
@@ -201,7 +202,7 @@ void recv_stream(string filename, bool standard_out)
             seq = (seq + 1) % 16;
         }
         // se recebeu a anterior, significa que o ack nao chegou no destino
-        else if (msg->seq != last_seq)
+        else
             send_ack(last_seq);
 
         delete msg;
