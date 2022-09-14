@@ -100,16 +100,14 @@ int main(int argc, char * argv[]) {
             if (Local) {
                 Message * res = execute_cd(param);
                 if (res->type == ERROR) {
-                    cout << data_to_str(res) << flush;
+                    cout << data_to_str(res) << "\n" << flush;
                 }
             }   
             else {
                 send_command(CD, param);
-                cout << "comando enviado\n" << flush;
                 Message * ans = assert_recv(0);
                 if (ans->type == ERROR)
-                    cout << data_to_str(ans) << flush;
-                cout << "comando executado\n" << flush;
+                    cout << data_to_str(ans) << "\n" << flush;
             }
         }
         else if (str_op == "get") {
@@ -134,7 +132,7 @@ int main(int argc, char * argv[]) {
                 }
                 // se nao envia dispara erro
                 else {
-                    cout << "Servidor nao tem espaço para receber o arquivo\n";
+                    cout << data_to_str(ans) << "\n" << flush;
                 }
             }
             else {
@@ -146,14 +144,14 @@ int main(int argc, char * argv[]) {
                 if (Local) {
                     Message * res = execute_mkdir(param);
                     if (res->type == ERROR) {
-                        cout << data_to_str(res) << flush;
+                        cout << data_to_str(res) << "\n" << flush;
                     }
                 }   
                 else {
                     send_command(MKDIR, param);
                     Message * ans = assert_recv(0);
                     if (ans->type == ERROR)
-                        cout << data_to_str(ans) << flush;      
+                        cout << data_to_str(ans) << "\n" << flush;      
                 }
             }
         }
