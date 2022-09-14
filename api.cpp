@@ -232,7 +232,7 @@ void send_command(int opt, string param)
         send_msg(msg);
         if (answer) delete answer;
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || answer->type != ACK);
+    } while(!answer || !valid_msg(answer) || answer->type == NACK);
     
     delete msg;
     delete answer;
