@@ -5,6 +5,7 @@
 
 #include <bits/stdc++.h>
 
+#define WINDOW_SIZE 4
 #define TIMEOUT_SECONDS 1
 
 // inicializa estruturas

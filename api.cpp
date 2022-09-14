@@ -142,6 +142,21 @@ Message * assert_recv(unsigned seq)
 }
 
 
+Message * send_window(queue<Message *>& window)
+{
+    Message * msg = NULL;
+    Message * ans = NULL;
+    do {
+        for(int i = 0; i < window.size(); i++) {
+            msg = window.front();
+            window.pop();
+            send_msg(msg);
+        }
+        ans = fetch_msg(true);
+    } while(!ans);
+    return ans;
+}
+
 void send_stream(FILE * stream)
 {
     char buffer[63];
@@ -152,30 +167,47 @@ void send_stream(FILE * stream)
 
     long long sum = 0;
     string str;
-    while(type != FIM) {
+
+    queue<Message *> to_send;
+    queue<Message *> save;
+
+    bool finish = false;
+    while(!finish) {
         // le os bytes da stream
-        bytes_read = fread(buffer, 1, 63, stream);
+        while(to_send.size() < WINDOW_SIZE && type != FIM) {
+            bytes_read = fread(buffer, 1, 63, stream);
+            // se leu tudo, marca como fim
+            if (feof(stream))
+                type = FIM;
+
+            msg = new Message(bytes_read, seq, type, buffer);
+            to_send.push(msg);
+
+            seq = (seq + 1) % 16;
+        }
         
-        // se leu tudo, marca como fim
-        if (feof(stream))
-            type = FIM;
+        save = to_send;
+        Message * answer = send_window(to_send);
 
-        // envia os dados
-        msg = new Message(bytes_read, seq, type, buffer);
-        assert_send(msg);
-        sum += bytes_read;
-        cout << "enviou " << msg->seq << "\n" << flush;
-        delete msg;
+        while(answer->seq != save.front()->seq) {
+            delete save.front();
+            save.pop();
+        }
+        if (answer->type == ACK) {
+            delete save.front();
+            save.pop();
+            if (type == FIM)
+                finish = true;
+        }
+        delete answer;
 
-        seq = (seq + 1) % 16;
+        to_send = save;
     }
-    cout << sum << " bytes enviados\n" << flush;
 }
 
 
 void recv_stream(string filename, bool standard_out)
 {
-    Message * msg = NULL;
     unsigned last_seq = 1987654321;
     unsigned seq = 0;
     int status = DADOS;
@@ -184,27 +216,48 @@ void recv_stream(string filename, bool standard_out)
     if (!standard_out)
         f = fopen(&filename[0], "wb");
 
+    struct cmp {bool operator()(Message * a, Message * b) {return a->seq == 15 && b->seq == 0 ? true : a->seq < b->seq;}};
+    priority_queue<
+        Message *,
+        vector<Message *>,
+        cmp
+    > window;
+
+    int last_valid = 0;
+    bool finish = false;
     do {
-        msg = assert_recv(seq);
-        status = msg->type;
-
-        if (msg->seq == seq) {
-            if (standard_out)
-                cout << data_to_str(msg) << flush;
-            else
-                fwrite(msg->data, 1, msg->size, f);
-
-            send_ack(seq);
-
-            last_seq = seq;
-            seq = (seq + 1) % 16;
+        Message * msg = NULL;
+        do {
+            if (msg) window.push(msg);
+            msg = fetch_msg(false);
         }
-        // se recebeu a anterior, significa que o ack nao chegou no destino
-        else if (msg->seq == last_seq)
-            send_ack(last_seq);
+        while(window.size() < WINDOW_SIZE && msg->type == DADOS);
 
-        delete msg;
-    } while(status != FIM);
+        do {
+            msg = window.top();
+            if (valid_msg(msg)) {
+                if (standard_out)
+                    cout << data_to_str(msg) << flush;
+                else
+                    fwrite(msg->data, 1, msg->size, f);
+                last_valid = msg->seq;
+                if (msg->type == FIM) {
+                    finish = true;
+                    break;
+                }
+            }
+            else {
+                send_nack(last_valid);
+                break;
+            }
+            window.pop();
+        } while(window.size() > 0);
+
+        while(window.size() > 0) {
+            delete window.top();
+            window.pop();
+        }
+    } while(!finish);
 
     if (f)
         fclose(f);
@@ -236,7 +289,7 @@ void send_command(int opt, string param)
         send_msg(msg);
         if (answer) delete answer;
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || msg->type == NACK);
+    } while(!answer || !valid_msg(answer) || answer->type == NACK);
     
     delete msg;
     delete answer;
