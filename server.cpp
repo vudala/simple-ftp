@@ -15,7 +15,7 @@ int main(int argc, char * argv[]) {
     init_con();
 
     while(1) {
-        // recebe uma mensagem
+        // recebe um comando
         Message * msg = fetch_msg(false);
         while(!valid_msg(msg)) {
             delete msg;
@@ -85,6 +85,8 @@ int main(int argc, char * argv[]) {
                     ans = new Message(0, 0, OK, NULL);
                     assert_send(ans);
                     delete ans;
+
+                    param = data_to_str(msg);
                     recv_stream(param, false);
                 }
                 else {
