@@ -11,7 +11,6 @@ enum Commands {
     GET = 0b001001,
     PUT = 0b001010,
     MKDIR = 0b001000,
-    CLOSE = 0b100111,
     PWD = 0b111001
 };
 

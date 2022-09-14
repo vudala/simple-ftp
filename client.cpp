@@ -94,11 +94,6 @@ int main(int argc, char * argv[]) {
             else {
                 send_command(LS, param);
                 recv_stream(string(), true);
-                // Message * ans = assert_recv(0);
-                // if (ans->type == OK)
-                    
-                // else
-                //     cout << data_to_str(ans) << flush;
             }
         }
         else if (str_op == "cd") {
@@ -143,7 +138,7 @@ int main(int argc, char * argv[]) {
                 }
             }
             else {
-                cout << "Arquivo nao existe\n" << flush;
+                cout << "Arquivo não existe\n" << flush;
             }
         }
         else if (str_op == "mkdir") {

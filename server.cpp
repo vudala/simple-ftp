@@ -82,7 +82,7 @@ int main(int argc, char * argv[]) {
                     recv_stream(param, false);
                 }
                 else {
-                    ans = new Message(0, 0, ERROR, NULL);
+                    ans = new Message(26, 0, ERROR, "Sem espaço o suficiente\n");
                     assert_send(ans);
                     delete ans;
                 }
@@ -99,9 +99,6 @@ int main(int argc, char * argv[]) {
             f = popen("echo -n $PWD" , "r");
             send_stream(f);
             fclose(f);
-            break;
-        case CLOSE:
-            exit(0);
             break;
         default:
             // faz nada
