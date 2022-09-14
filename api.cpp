@@ -69,8 +69,10 @@ Message * fetch_msg(bool tout)
     
     do {
         if (recv(sockfd, msk, sizeof(Mask), 0) == -1) {
-            if (Interrupted)
+            if (Interrupted) {
+                alarm(0);
                 return NULL;
+            }
             perror("recv: ");
             exit(-1);
         };
@@ -96,14 +98,6 @@ void send_ack(unsigned seq)
 void send_nack(unsigned seq)
 {
     Message * m = new Message(0, seq, NACK, NULL);
-    send_msg(m);
-    delete m;
-}
-
-
-void send_ok(unsigned seq)
-{
-    Message * m = new Message(0, seq, OK, NULL);
     send_msg(m);
     delete m;
 }
@@ -177,11 +171,11 @@ void send_stream(FILE * stream)
 void recv_stream(string filename, bool standard_out)
 {
     Message * msg = NULL;
-    unsigned last_seq = 1987654321;
+    unsigned last_seq = 0;
     unsigned seq = 0;
     int status = DADOS;
 
-    FILE * f = NULL;
+    FILE * f = stdout;
     if (!standard_out)
         f = fopen(&filename[0], "wb");
 
@@ -189,10 +183,7 @@ void recv_stream(string filename, bool standard_out)
         msg = assert_recv(seq);
         
         if (msg->seq == seq) {
-            if (standard_out)
-                cout << data_to_str(msg) << flush;
-            else
-                fwrite(msg->data, 1, msg->size, f);
+            fwrite(msg->data, 1, msg->size, f);
 
             status = msg->type;
 
@@ -208,7 +199,7 @@ void recv_stream(string filename, bool standard_out)
         delete msg;
     } while(status != FIM);
 
-    if (f)
+    if (!standard_out)
         fclose(f);
 }
 
