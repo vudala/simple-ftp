@@ -19,10 +19,10 @@ int main(int argc, char * argv[]) {
         Message * msg = fetch_msg(false);
         while(!valid_msg(msg)) {
             delete msg;
-            send_nack(msg->seq);
+            send_nack(0);
             msg = fetch_msg(false);
         }
-        send_ack(msg->seq);
+        send_ack(0);
         
         // faz a operacao
         FILE *f, *p;
@@ -50,17 +50,18 @@ int main(int argc, char * argv[]) {
             delete result;
             break;
         case GET:
+            cout << "get recebido\n" << flush;
             // envia um arquivo para o client
             param = data_to_str(msg);
             // verifica se o arquivo existe
             if (filesystem::exists(param)) {
+                cout << "enviando descritor\n" << flush;
                 ans = build_descriptor(filesize(param));
                 assert_send(ans);
                 delete ans;
+                cout << "descritor enviado\n" << flush;
 
-                // envia o descritor pro cliente
                 ans = assert_recv(0);
-
                 // se recebeu uma resposta positiva pra enviar
                 if (ans->type == OK) {
                     f = open_file(param);
