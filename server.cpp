@@ -65,7 +65,7 @@ int main(int argc, char * argv[]) {
                 }
             }
             else {
-                ans = new Message(21, 0, ERROR, (char *) "Arquivo inexistente\n");
+                ans = new Message(19, 0, ERROR, (char *) "Arquivo nao existe");
                 assert_send(ans);
             }
             break;
@@ -82,7 +82,7 @@ int main(int argc, char * argv[]) {
                     recv_stream(param, false);
                 }
                 else {
-                    ans = new Message(26, 0, ERROR, "Sem espaço o suficiente\n");
+                    ans = new Message(25, 0, ERROR, "Sem espaço o suficiente");
                     assert_send(ans);
                     delete ans;
                 }

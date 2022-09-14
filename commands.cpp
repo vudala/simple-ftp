@@ -19,13 +19,13 @@ Message * execute_cd(string path)
     if (ret == -1) {
         switch (errno) {
             case ENOENT:
-                return new Message(23, 0, ERROR, (char*) "Diretorio inexistente\n");
+                return new Message(22, 0, ERROR, (char*) "Diretorio inexistente");
             case EACCES:
-                return new Message(26, 0, ERROR, (char*) "Sem permissao de leitura\n");
+                return new Message(25, 0, ERROR, (char*) "Sem permissao de leitura");
             case ELOOP:
-                return new Message(20, 0, ERROR, (char*) "Muitos links simbolicos\n");
+                return new Message(24, 0, ERROR, (char*) "Muitos links simbolicos");
             case ENAMETOOLONG:
-                return new Message(27, 0, ERROR, (char*) "Caminho muito longo\n");
+                return new Message(20, 0, ERROR, (char*) "Caminho muito longo");
         }
     }
     return new Message(0, 0, OK, NULL);
@@ -39,11 +39,11 @@ Message * execute_mkdir(string name)
     if (ret == -1) {
         switch (errno) {
             case EACCES :
-                return new Message(26, 0, ERROR, (char*) "Sem permissao de escrita\n");
+                return new Message(25, 0, ERROR, (char*) "Sem permissao de escrita");
             case EEXIST:
-                return new Message(21, 0, ERROR, (char*) "Diretorio ja existe\n");
+                return new Message(20, 0, ERROR, (char*) "Diretorio ja existe");
             case ENAMETOOLONG:
-                return new Message(27, 0, ERROR, (char*) "Nome de pasta muito longo\n");
+                return new Message(26, 0, ERROR, (char*) "Nome de pasta muito longo");
         }
     }
     return new Message(0, 0, OK, NULL);
@@ -81,6 +81,6 @@ void execute_get(string param)
     }
     // se recebeu um erro, o arquivo nao existe
     else {
-        cout << "Arquivo inexistente\n" << flush;
+        cout << data_to_str(ans) << flush;
     }
 }
