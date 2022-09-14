@@ -110,16 +110,17 @@ int main(int argc, char * argv[]) {
                     cout << data_to_str(ans) << "\n" << flush;
             }
         }
-        else if (str_op == "get") {
+        else if (str_op == "get" && Local) {
             execute_get(param);
         }
         else if (str_op == "put" && Local) {
             // se o arquiv existe
             if (filesystem::exists(param)) {
-                // envia o tamanho dele pro servidor
+                // envia comando
                 send_command(PUT, param);
+                
+                // envia descritor
                 Message * tos = build_descriptor(filesize(param));
-
                 assert_send(tos);
                 delete tos;
 
@@ -130,7 +131,7 @@ int main(int argc, char * argv[]) {
                     send_stream(f);
                     fclose(f);
                 }
-                // se nao envia dispara erro
+                // dispara erro
                 else {
                     cout << data_to_str(ans) << "\n" << flush;
                 }
