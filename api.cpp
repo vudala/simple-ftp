@@ -125,8 +125,9 @@ void assert_send(Message * msg)
     Message * answer = NULL;
     do {
         send_msg(msg);
+        if (answer) delete answer;
         answer = fetch_msg(true);
-    } while(!answer || !valid_msg(answer) || msg->type == NACK);
+    } while(!answer || !valid_msg(answer) || answer->type != ACK);
 }
 
 
@@ -163,10 +164,10 @@ void send_stream(FILE * stream)
         // envia os dados
         msg = new Message(bytes_read, seq, type, buffer);
         assert_send(msg);
-        sum += bytes_read;
-        cout << "enviou " << msg->seq << "\n" << flush;
         delete msg;
 
+        sum += bytes_read;
+        
         seq = (seq + 1) % 16;
     }
     cout << sum << " bytes enviados\n" << flush;
@@ -195,7 +196,6 @@ void recv_stream(string filename, bool standard_out)
                 fwrite(msg->data, 1, msg->size, f);
 
             send_ack(seq);
-            cout << msg->size << " bytes recebidos\n" << flush; 
 
             last_seq = seq;
             seq = (seq + 1) % 16;
