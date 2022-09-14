@@ -85,7 +85,7 @@ int main(int argc, char * argv[]) {
                     recv_stream(param, false);
                 }
                 else {
-                    ans = new Message(25, 0, ERROR, "Sem espaço o suficiente");
+                    ans = new Message(25, 0, ERROR, (char *) "Sem espaço o suficiente");
                     assert_send(ans);
                     delete ans;
                 }
