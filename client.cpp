@@ -27,10 +27,10 @@ void print_path()
 {
     if (Local) {
         cout << "\n[LOCAL] ";
-        FILE * f = popen("echo -n $PWD", "r");
-        print_stream(f);
+        FILE * p = popen("echo -n $PWD", "r");
+        print_stream(p);
         cout << ": " << flush;
-        fclose(f);
+        fclose(p);
     }
     else {
         cout << "\n[REMOTO] ";
@@ -87,9 +87,9 @@ int main(int argc, char * argv[]) {
                 string command = "ls ";
                 if (find(ls_opts.begin(), ls_opts.end(), param) != ls_opts.end())
                     command.append(param);
-                FILE * f = popen(&command[0], "r");
-                print_stream(f);
-                fclose(f);
+                FILE * p = popen(&command[0], "r");
+                print_stream(p);
+                pclose(p);
             }
             else {
                 send_command(LS, param);
@@ -126,7 +126,7 @@ int main(int argc, char * argv[]) {
                 Message * ans = assert_recv(0);
                 // se o servidor tem capacidade de receber o arquivo
                 if (ans->type == OK) {
-                    FILE * f = fopen(&param[0], "rb");
+                    FILE * f = open_file(param);
                     send_stream(f);
                     fclose(f);
                 }

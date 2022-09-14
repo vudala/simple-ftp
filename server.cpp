@@ -25,7 +25,7 @@ int main(int argc, char * argv[]) {
         send_ack(msg->seq);
         
         // faz a operacao
-        FILE * f;
+        FILE *f, *p;
         string param;
         ofstream ofs;
         Message * result = NULL;
@@ -36,9 +36,11 @@ int main(int argc, char * argv[]) {
             // lista os arquivos no server
             param = "ls ";
             param.append(data_to_str(msg));
-            f = popen(&param[0], "r");
-            send_stream(f);
-            fclose(f);
+
+            p = popen(&param[0], "r");
+            send_stream(p);
+            pclose(p);
+
             break;
         case CD:
             // muda de pasta no server
@@ -61,7 +63,7 @@ int main(int argc, char * argv[]) {
 
                 // se recebeu uma resposta positiva pra enviar
                 if (ans->type == OK) {
-                    f = fopen(&param[0], "rb");
+                    f = open_file(param);
                     send_stream(f);
                     fclose(f);
                 }
@@ -100,9 +102,9 @@ int main(int argc, char * argv[]) {
             break;
         case PWD:
             // envia o diretorio atual
-            f = popen("echo -n $PWD" , "r");
-            send_stream(f);
-            fclose(f);
+            p = popen("echo -n $PWD" , "r");
+            send_stream(p);
+            pclose(p);
             break;
         default:
             // faz nada
