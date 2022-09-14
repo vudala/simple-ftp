@@ -54,6 +54,8 @@ int main(int argc, char * argv[]) {
             if (filesystem::exists(param)) {
                 ans = build_descriptor(filesize(param));
                 assert_send(ans);
+                delete ans;
+
                 // envia o descritor pro cliente
                 ans = assert_recv(0);
 
@@ -67,6 +69,7 @@ int main(int argc, char * argv[]) {
             else {
                 ans = new Message(19, 0, ERROR, (char *) "Arquivo nao existe");
                 assert_send(ans);
+                delete ans;
             }
             break;
         case PUT:
@@ -93,6 +96,7 @@ int main(int argc, char * argv[]) {
             param = data_to_str(msg);
             result = execute_mkdir(param);
             assert_send(result);
+            delete result;
             break;
         case PWD:
             // envia o diretorio atual
