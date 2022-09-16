@@ -63,7 +63,7 @@ int main(int argc, char * argv[]) {
         {.fd = getsockfd(), .events = POLLIN, .revents = 0}
     };
 
-    cout << "Bem vindo ao SimpleFTP do vudala HAHAHAHAHAHAHAHAHAH\n\n";
+    cout << "Bem vindo ao SimpleFTP do vudala\n\n";
     print_commands();
 
     print_path();
@@ -128,7 +128,9 @@ int main(int argc, char * argv[]) {
                 // se o servidor tem capacidade de receber o arquivo
                 if (ans->type == OK) {
                     FILE * f = open_file(param);
+                    cout << "[+] Enviando arquivo\n" << flush;
                     send_stream(f);
+                    cout << "[+] Arquivo enviado\n" << flush;
                     fclose(f);
                 }
                 // dispara erro
@@ -163,6 +165,6 @@ int main(int argc, char * argv[]) {
             exit(0);
 
         print_path();
-        }
+       }
     }
 }

@@ -55,11 +55,9 @@ int main(int argc, char * argv[]) {
             param = data_to_str(msg);
             // verifica se o arquivo existe
             if (filesystem::exists(param)) {
-                cout << "enviando descritor\n" << flush;
                 ans = build_descriptor(filesize(param));
                 assert_send(ans);
                 delete ans;
-                cout << "descritor enviado\n" << flush;
 
                 ans = assert_recv(0);
                 // se recebeu uma resposta positiva pra enviar

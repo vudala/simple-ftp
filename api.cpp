@@ -236,12 +236,8 @@ void read_garbage()
     Mask * msk = new Mask();
     recv(getsockfd(), msk, sizeof(Mask), 0);
     Message * msg = new Message(msk);
-    if (msg->mark == MARKER) {
-        if (!valid_msg(msg))
-            send_nack(msg->seq);
-        else
-            send_ack(msg->seq);
-    }
+    if (msg->mark == MARKER)
+        send_ack(msg->seq);
     delete msg;
     delete msk;
 }
