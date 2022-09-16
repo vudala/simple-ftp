@@ -52,29 +52,17 @@ void print_commands()
     cout << "close  # encerra o cliente\n" << flush;
 }
 
-
 int main(int argc, char * argv[]) {
     Interface = argv[1];
 
     init_con();
 
-    struct pollfd descriptors[2] = {
-        {.fd = 0, .events = POLLIN, .revents = 0},
-        {.fd = getsockfd(), .events = POLLIN, .revents = 0}
-    };
-
-    cout << "Bem vindo ao SimpleFTP do vudala\n\n";
+    cout << "Bem vindo ao SimpleFTP do vudala\n";
     print_commands();
 
     print_path();
 
     while(1) {
-        poll(descriptors, 2, -1);
-        if(descriptors[1].revents & POLLIN) {
-            read_garbage();
-        }
-        else if(descriptors[0].revents & POLLIN) {
-
         string buff;
         getline(cin, buff);
 
@@ -110,10 +98,45 @@ int main(int argc, char * argv[]) {
                     cout << data_to_str(ans) << "\n" << flush;
             }
         }
-        else if (str_op == "get" && Local) {
-            execute_get(param);
+        else if (str_op == "get") {
+            send_command(GET, param);
+
+            Message * ans = assert_recv(0);
+            // recebe descritor
+            if (ans->type == DESCRITOR) {
+                unsigned long long fsize;
+                memcpy(&fsize, ans->data, 8);
+
+                unsigned long long av = available_space();
+                
+                // se tem espaco pra receber o arquivo
+                if (fsize <= av) {
+                    // informa que esta apto a receber e começa a requistar uma stream de dados
+                    ans = new Message(0, 0, OK, NULL);
+                    assert_send(ans);
+                    delete ans;
+
+                    cout << "[+] Recebendo arquivo\n" << flush;
+
+                    // comeca a receber a stream
+                    recv_stream(param, false);
+
+                    cout << "[+] Arquivo recebido\n" << flush;
+                }
+                // se nao tem, dispara um erro informando que o servidor nao deve enviar nada
+                else {
+                    cout << "Sem espaço suficiente para receber o arquivo\n" << flush;
+                    ans = new Message(0, 0, ERROR, NULL);
+                    assert_send(ans);
+                    delete ans;
+                }
+            }
+            // se recebeu um erro, o arquivo nao existe
+            else {
+                cout << data_to_str(ans) << flush;
+            }
         }
-        else if (str_op == "put" && Local) {
+        else if (str_op == "put") {
             // se o arquiv existe
             if (filesystem::exists(param)) {
                 // envia comando
@@ -165,6 +188,5 @@ int main(int argc, char * argv[]) {
             exit(0);
 
         print_path();
-       }
     }
 }
